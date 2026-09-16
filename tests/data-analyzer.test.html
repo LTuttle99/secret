@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Analyzer — Test Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300133C'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%230062F1' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
+
+    <header class="border-b border-slate-200 bg-white px-8 py-4">
+        <h1 class="text-xl font-semibold tracking-wide text-[#00133C]">Data Analyzer <span class="text-[#0062F1] font-normal">Test Suite</span></h1>
+        <p class="text-xs text-slate-500 mt-1">
+            A self-contained, in-browser check of the math and logic behind the Data Analyzer —
+            regression, forecasting, goal pacing, entity classification, anomaly detection, schema
+            inference, and CSV parsing. No build step, no dependencies beyond what the tool itself
+            already loads. Open this file directly (via <code>./serve.sh</code> or a double-click)
+            to run it; results render below and are also logged to the console.
+        </p>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-6 space-y-4">
+        <div id="summary" class="bg-white border border-slate-200 rounded-xl p-5"></div>
+        <div id="results" class="space-y-2"></div>
+    </main>
+
+    <script src="../tools/data-analyzer/js/core.js"></script>
+    <script src="../tools/data-analyzer/js/schema.js"></script>
+    <script src="../tools/data-analyzer/js/forecast.js"></script>
+    <script src="../tools/data-analyzer/js/goals.js"></script>
+    <script src="../tools/data-analyzer/js/insights.js"></script>
+    <script src="../tools/data-analyzer/js/run-analysis.js"></script>
+
+    <script>
+        const results = [];
+
+        function test(name, fn) {
+            try {
+                fn();
+                results.push({ name, pass: true });
+            } catch (e) {
+                results.push({ name, pass: false, error: e.message });
+            }
+        }
+
+        function assertEqual(actual, expected, label) {
+            if (actual !== expected) {
+                throw new Error(`${label || 'assertEqual'}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`);
+            }
+        }
+
+        function assertClose(actual, expected, tolerance, label) {
+            if (typeof actual !== 'number' || Number.isNaN(actual) || Math.abs(actual - expected) > tolerance) {
+                throw new Error(`${label || 'assertClose'}: expected ~${expected} (±${tolerance}), got ${actual}`);
+            }
+        }
+
+        function assertDeepEqual(actual, expected, label) {
+            const a = JSON.stringify(actual);
+            const b = JSON.stringify(expected);
+            if (a !== b) {
+                throw new Error(`${label || 'assertDeepEqual'}: expected ${b}, got ${a}`);
+            }
+        }
+
+        function assertTrue(cond, label) {
+            if (!cond) throw new Error(label || 'assertTrue failed');
+        }
+
+        function d(iso) {
+            const [y, m, day] = iso.split('-').map(Number);
+            return new Date(Date.UTC(y, m - 1, day));
+        }
+
+        test('toNumber parses numeric strings and rejects junk', () => {
+            assertEqual(toNumber('123.45'), 123.45);
+            assertEqual(toNumber('  42  '), 42);
+            assertEqual(toNumber(''), null);
+            assertEqual(toNumber('abc'), null);
+            assertEqual(toNumber(null), null);
+            assertEqual(toNumber(7), 7);
+        });
+
+        test('toDate parses ISO and rejects unparseable strings', () => {
+            assertEqual(toDate('2024-03-15').getTime(), d('2024-03-15').getTime());
+            assertEqual(toDate(''), null);
+            assertEqual(toDate('not a date at all'), null);
+        });
+
+        test('toDate refuses prefixed ids instead of inventing a year', () => {
+            assertEqual(toDate('CUST-0042'), null, 'prefixed id must not become Jan 1 2042');
+            assertEqual(toDate('ABC-123'), null, 'prefixed id with short number');
+            assertEqual(toDate('A-1'), null, 'two character id');
+            assertEqual(toDate('2042'), null, 'bare year');
+            assertEqual(toDate('March 2024'), null, 'month and year with no day');
+            assertEqual(toDate('Q1-2024'), null, 'quarter label');
+        });
+
+        test('toDate rejects impossible calendar dates', () => {
+            assertEqual(toDate('2026-13-45'), null, 'month 13 day 45');
+            assertEqual(toDate('2026-02-31'), null, 'February 31st must not roll over');
+            assertEqual(toDate('13/45/2026'), null, 'US order out of range');
+        });
+
+        test('toDate still accepts every format real exports use', () => {
+            assertEqual(formatDateISO(toDate('2024-03-15')), '2024-03-15', 'ISO');
+            assertEqual(formatDateISO(toDate('2024-03-15T10:30:00Z')), '2024-03-15', 'ISO with time');
+            assertEqual(formatDateISO(toDate('2024/03/15')), '2024-03-15', 'ISO with slashes');
+            assertEqual(formatDateISO(toDate('03/15/2024')), '2024-03-15', 'US slash');
+            assertEqual(formatDateISO(toDate('3/15/24')), '2024-03-15', 'US slash two digit year');
+            assertEqual(formatDateISO(toDate('3-15-2024')), '2024-03-15', 'US dash');
+            assertEqual(formatDateISO(toDate('Mar 15, 2024')), '2024-03-15', 'month name first');
+            assertEqual(formatDateISO(toDate('15-Mar-2024')), '2024-03-15', 'day month name year');
+            assertEqual(formatDateISO(toDate('March 15, 2024')), '2024-03-15', 'full month name');
+        });
+
+        test('toDate reads Excel serials and YYYYMMDD integers', () => {
+            assertEqual(formatDateISO(toDate(45366)), '2024-03-15', 'Excel serial');
+            assertEqual(formatDateISO(toDate(20240315)), '2024-03-15', 'YYYYMMDD integer');
+            assertEqual(toDate(20241345), null, 'invalid YYYYMMDD integer');
+            assertEqual(toDate(1200), null, 'plain small number is not a date');
+        });
+
+        test('columnNameMatches uses whole tokens, not bare substrings', () => {
+            assertTrue(!columnNameMatches('Paid Amount', ID_LIKE_EXCLUDE_HINTS), '"Paid" must not match the id hint');
+            assertTrue(!columnNameMatches('Provider', ID_LIKE_EXCLUDE_HINTS), '"Provider" must not match the id hint');
+            assertTrue(!columnNameMatches('Notes', ID_LIKE_EXCLUDE_HINTS), '"Notes" must not match the no hint');
+            assertTrue(columnNameMatches('customer_id', ID_LIKE_EXCLUDE_HINTS), 'customer_id is id-like');
+            assertTrue(columnNameMatches('Customer ID', ID_LIKE_EXCLUDE_HINTS), 'spaced id is id-like');
+            assertTrue(columnNameMatches('customerId', ID_LIKE_EXCLUDE_HINTS), 'camelCase id is id-like');
+        });
+
+        test('a column named Paid Amount survives as a metric candidate', () => {
+            const columns = ['order_date', 'Paid Amount', 'region'];
+            const rows = [];
+            for (let i = 1; i <= 12; i++) {
+                rows.push({
+                    order_date: `2024-01-${String(i).padStart(2, '0')}`,
+                    'Paid Amount': 100 * i,
+                    region: i % 2 ? 'East' : 'West'
+                });
+            }
+            const schema = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv').inferSchema();
+            assertTrue(schema.numeric_columns.includes('Paid Amount'), 'Paid Amount should be numeric, not id-like');
+            assertEqual(schema.inferred_mapping.metric_column, 'Paid Amount');
+        });
+
+        test('a YYYYMMDD integer column is read as the timeline, not the metric', () => {
+            const columns = ['order_date', 'revenue'];
+            const rows = [];
+            for (let i = 1; i <= 12; i++) {
+                rows.push({ order_date: 20240100 + i, revenue: 500 + i });
+            }
+            const schema = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv').inferSchema();
+            assertEqual(schema.inferred_mapping.timeline_column, 'order_date');
+            assertEqual(schema.inferred_mapping.metric_column, 'revenue');
+        });
+
+        test('metric picking scores candidates instead of taking the leftmost name match', () => {
+            const columns = ['Total Count', 'Revenue'];
+            const rows = [];
+            for (let i = 1; i <= 30; i++) {
+                rows.push({ 'Total Count': (i % 5) + 1, Revenue: 1000.5 + i * 37.25 });
+            }
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            assertEqual(analyzer._pickMetricColumn(['Total Count', 'Revenue']), 'Revenue');
+        });
+
+        test('isMissing treats null, undefined, NaN, and blank strings as missing', () => {
+            assertTrue(isMissing(null));
+            assertTrue(isMissing(undefined));
+            assertTrue(isMissing(NaN));
+            assertTrue(isMissing('   '));
+            assertTrue(!isMissing(0));
+            assertTrue(!isMissing('x'));
+        });
+
+        test('mean and std match hand-computed values', () => {
+            assertClose(mean([1, 2, 3, 4]), 2.5, 1e-9);
+            assertClose(std([2, 4, 4, 4, 5, 5, 7, 9]), 2, 1e-9);
+        });
+
+        test('clamp bounds a value on both sides', () => {
+            assertEqual(clamp(5, 0, 10), 5);
+            assertEqual(clamp(-1, 0, 10), 0);
+            assertEqual(clamp(15, 0, 10), 10);
+        });
+
+        test('linearRegression fits a perfect line exactly', () => {
+            const reg = linearRegression([0, 1, 2, 3, 4], [2, 4, 6, 8, 10]);
+            assertClose(reg.slope, 2, 1e-9);
+            assertClose(reg.intercept, 2, 1e-9);
+            assertClose(reg.r2, 1, 1e-9);
+            assertClose(reg.predict(5), 12, 1e-9);
+        });
+
+        test('linearRegression on flat data has zero slope and predicts the constant', () => {
+            const reg = linearRegression([0, 1, 2, 3], [5, 5, 5, 5]);
+            assertClose(reg.slope, 0, 1e-9);
+            assertClose(reg.predict(10), 5, 1e-9);
+        });
+
+        test('parseCSVText handles quoted fields with embedded commas and escaped quotes', () => {
+            const csv = 'name,note\n"Acme, Inc.","She said ""hi"""\nGlobex,plain\n';
+            const { columns, rows } = parseCSVText(csv);
+            assertEqual(columns.join('|'), 'name|note');
+            assertEqual(rows.length, 2);
+            assertEqual(rows[0].name, 'Acme, Inc.');
+            assertEqual(rows[0].note, 'She said "hi"');
+            assertEqual(rows[1].name, 'Globex');
+        });
+
+        test('parseCSVText turns blank cells into null', () => {
+            const { rows } = parseCSVText('a,b\n1,\n,2\n');
+            assertEqual(rows[0].b, null);
+            assertEqual(rows[1].a, null);
+        });
+
+        test('countDuplicateRows counts only fully-identical rows', () => {
+            const columns = ['a', 'b'];
+            const rows = [
+                { a: 1, b: 'x' },
+                { a: 1, b: 'x' },
+                { a: 1, b: 'y' },
+            ];
+            assertEqual(countDuplicateRows(rows, columns), 1);
+        });
+
+        test('inferSchema picks the right metric, timeline, entity, and dimension columns', () => {
+            const columns = ['order_id', 'order_date', 'revenue', 'region', 'customer'];
+            const regions = ['East', 'West'];
+            const customers = ['Acme', 'Globex', 'Initech'];
+            const rows = [];
+            for (let i = 1; i <= 12; i++) {
+                rows.push({
+                    order_id: i,
+                    order_date: `2024-01-${String(i).padStart(2, '0')}`,
+                    revenue: 100 * i,
+                    region: regions[i % regions.length],
+                    customer: customers[i % customers.length]
+                });
+            }
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const schema = analyzer.inferSchema();
+
+            assertEqual(schema.inferred_mapping.metric_column, 'revenue');
+            assertEqual(schema.inferred_mapping.timeline_column, 'order_date');
+            assertEqual(schema.inferred_mapping.entity_column, 'customer');
+            assertTrue(schema.inferred_mapping.dimension_columns.includes('region'), 'region should be a dimension candidate');
+            assertTrue(schema.numeric_columns.includes('revenue'), 'revenue should be numeric');
+            assertTrue(!schema.numeric_columns.includes('order_id'), 'order_id should be classified ID-like, not numeric');
+        });
+
+        test('assessDataQuality flags duplicate rows', () => {
+            const columns = ['date', 'amount'];
+            const rows = [
+                { date: '2024-01-01', amount: 10 },
+                { date: '2024-01-01', amount: 10 },
+                { date: '2024-01-02', amount: 20 }
+            ];
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const quality = analyzer.assessDataQuality({ metric_column: 'amount', timeline_column: 'date', entity_column: null, dimension_columns: [] });
+            assertEqual(quality.duplicate_rows, 1);
+            assertTrue(quality.warnings.some((w) => w.toLowerCase().includes('duplicate')), 'should warn about duplicates');
+        });
+
+        test('runAnalysis computes total, average, and HHI correctly for a known split', () => {
+            const columns = ['date', 'amount', 'region'];
+            const rows = [
+                { date: '2024-01-10', amount: 600, region: 'A' },
+                { date: '2024-01-15', amount: 300, region: 'B' },
+                { date: '2024-01-20', amount: 100, region: 'C' }
+            ];
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const res = analyzer.runAnalysis({
+                mapping: { metric_column: 'amount', timeline_column: 'date', entity_column: null, dimension_columns: ['region'] },
+                dimension_filters: {},
+                projection_target: 'value',
+                primary_dimension: 'region',
+                include_future_dates: true,
+                goals: [],
+                entity_view: 'all'
+            });
+
+            assertEqual(res.kpis.total_metric_value, 1000);
+            assertClose(res.kpis.avg_entity_value, 1000 / 3, 1e-6);
+            assertClose(res.kpis.hhi_index, 4600, 1e-6);
+            assertEqual(res.entity_split.classification_method, 'unavailable');
+        });
+
+        test('the delimiter is sniffed, so a semicolon or tab file is not one column', () => {
+            const comma = parseCSVText('region,revenue\nNorth,100\nSouth,200');
+            assertEqual(comma.delimiter, ',');
+            assertDeepEqual(comma.columns, ['region', 'revenue']);
+
+            const semi = parseCSVText('region;revenue\nNorth;100\nSouth;200');
+            assertEqual(semi.delimiter, ';');
+            assertDeepEqual(semi.columns, ['region', 'revenue']);
+            assertEqual(semi.rows[1].revenue, '200');
+
+            const tab = parseCSVText('region\trevenue\nNorth\t100\nSouth\t200');
+            assertEqual(tab.delimiter, '\t');
+            assertDeepEqual(tab.columns, ['region', 'revenue']);
+
+            const pipe = parseCSVText('region|revenue\nNorth|100\nSouth|200');
+            assertEqual(pipe.delimiter, '|');
+            assertDeepEqual(pipe.columns, ['region', 'revenue']);
+        });
+
+        test('a comma file containing semicolons inside values still reads as comma', () => {
+            const parsed = parseCSVText('name,note\nAda,"first; second; third"\nGrace,"a; b"');
+            assertEqual(parsed.delimiter, ',');
+            assertDeepEqual(parsed.columns, ['name', 'note']);
+            assertEqual(parsed.rows[0].note, 'first; second; third');
+        });
+
+        test('a single column file does not invent a delimiter', () => {
+            const parsed = parseCSVText('region\nNorth\nSouth');
+            assertDeepEqual(parsed.columns, ['region']);
+            assertEqual(parsed.rows.length, 2);
+        });
+
+        test('European decimals are read only when a column proves it', () => {
+            assertTrue(europeanDecimalVerdict(['1.234,56', '2.000,10']), 'comma decimals prove European');
+            assertTrue(europeanDecimalVerdict(['1234,5']), 'a bare comma decimal proves it too');
+            assertTrue(!europeanDecimalVerdict(['1,234.56']), 'US grouping is not European');
+            assertTrue(!europeanDecimalVerdict(['1.234']), 'an ambiguous value alone proves nothing');
+            assertTrue(!europeanDecimalVerdict(['1.234', '5.678']), 'still ambiguous, so left alone');
+            assertTrue(!europeanDecimalVerdict(['1.234,56', '9,876.54']), 'a mixed column is refused rather than guessed');
+        });
+
+        test('a European column is converted and the rest of the file is untouched', () => {
+            const parsed = parseCSVText('region;revenue;code\nNorth;1.234,56;1.234\nSouth;2.000,10;5.678');
+            const euro = detectEuropeanColumns(parsed.rows, parsed.columns);
+            assertDeepEqual(euro, ['revenue'], 'only the column that proved it');
+
+            applyEuropeanDecimals(parsed.rows, euro);
+            assertEqual(toNumber(parsed.rows[0].revenue), 1234.56);
+            assertEqual(toNumber(parsed.rows[1].revenue), 2000.10);
+            assertEqual(parsed.rows[0].code, '1.234', 'the ambiguous column is left exactly as it was');
+        });
+
+        test('wide month columns are detected and reshaped into a timeline', () => {
+            const columns = ['Region', '2024-01', '2024-02', '2024-03'];
+            const rows = [
+                { Region: 'North', '2024-01': 100, '2024-02': 110, '2024-03': 120 },
+                { Region: 'South', '2024-01': 200, '2024-02': 190, '2024-03': 210 }
+            ];
+
+            const layout = detectWideLayout(columns, rows);
+            assertTrue(layout !== null, 'three dated columns is a wide layout');
+            assertEqual(layout.periodColumns.length, 3);
+            assertDeepEqual(layout.idColumns, ['Region']);
+
+            const long = unpivotWide(columns, rows, layout);
+            assertEqual(long.rows.length, 6, 'two entities times three months');
+            assertDeepEqual(long.columns, ['Region', WIDE_PERIOD_COLUMN, WIDE_VALUE_COLUMN]);
+            assertEqual(long.rows[0][WIDE_PERIOD_COLUMN], '2024-01-01');
+            assertEqual(long.rows[0][WIDE_VALUE_COLUMN], 100);
+            assertEqual(long.rows[0].Region, 'North');
+        });
+
+        test('wide detection accepts quarters and month names with a year', () => {
+            const quarters = detectWideLayout(
+                ['Team', 'Q1 2024', 'Q2 2024', 'Q3 2024'],
+                [{ Team: 'A', 'Q1 2024': 1, 'Q2 2024': 2, 'Q3 2024': 3 }]
+            );
+            assertTrue(quarters !== null, 'quarters are periods');
+            assertEqual(formatDateISO(quarters.periodColumns[1].date), '2024-04-01');
+
+            const named = detectWideLayout(
+                ['Team', 'Jan 2024', 'Feb 2024', 'Mar 2024'],
+                [{ Team: 'A', 'Jan 2024': 1, 'Feb 2024': 2, 'Mar 2024': 3 }]
+            );
+            assertTrue(named !== null, 'month names with a year are periods');
+            assertEqual(formatDateISO(named.periodColumns[2].date), '2024-03-01');
+        });
+
+        test('wide detection refuses shapes it cannot honestly reshape', () => {
+            assertEqual(
+                detectWideLayout(['Region', '2024-01', '2024-02'], [{ Region: 'N', '2024-01': 1, '2024-02': 2 }]),
+                null,
+                'two period columns is not enough to be sure'
+            );
+
+            assertEqual(
+                detectWideLayout(['2024-01', '2024-02', '2024-03'], [{ '2024-01': 1, '2024-02': 2, '2024-03': 3 }]),
+                null,
+                'with no id column there is nothing to keep'
+            );
+
+            assertEqual(
+                detectWideLayout(
+                    ['Region', '2024-01', '2024-02', '2024-03'],
+                    [{ Region: 'N', '2024-01': 'yes', '2024-02': 'no', '2024-03': 'maybe' }]
+                ),
+                null,
+                'dated headers over text are not measurements'
+            );
+
+            assertEqual(
+                detectWideLayout(
+                    ['Region', 'Jan', 'Feb', '2024-03'],
+                    [{ Region: 'N', Jan: 1, Feb: 2, '2024-03': 3 }]
+                ),
+                null,
+                'mixing bare month names with real dates is ambiguous, so it declines'
+            );
+        });
+
+        test('a normal long file is never mistaken for a wide one', () => {
+            const layout = detectWideLayout(
+                ['order_date', 'region', 'revenue'],
+                [{ order_date: '2024-01-15', region: 'North', revenue: 100 }]
+            );
+            assertEqual(layout, null, 'ordinary column names are not periods');
+        });
+
+        test('JSON is read, including nested objects and arrays', () => {
+            const parsed = parseJSONText(JSON.stringify([
+                { id: 1, customer: { name: 'Ada', city: 'London' }, tags: ['a', 'b'], revenue: 100 },
+                { id: 2, customer: { name: 'Grace', city: 'Leeds' }, tags: ['c'], revenue: 200 }
+            ]));
+
+            assertTrue(parsed.columns.includes('customer.name'), `nested keys flatten, got ${parsed.columns.join('|')}`);
+            assertEqual(parsed.rows[0]['customer.city'], 'London');
+            assertEqual(parsed.rows[0].tags, 'a, b', 'a scalar array becomes a readable cell');
+            assertEqual(parsed.rows[1].revenue, 200);
+            assertEqual(parsed.rows.length, 2);
+        });
+
+        test('JSON records with different keys are squared off', () => {
+            const parsed = parseJSONText(JSON.stringify([{ a: 1 }, { b: 2 }]));
+            assertDeepEqual(parsed.columns, ['a', 'b']);
+            assertEqual(parsed.rows[0].b, null, 'a missing key becomes a blank rather than undefined');
+            assertEqual(parsed.rows[1].a, null);
+        });
+
+        test('JSON wrapped in an envelope finds the records inside it', () => {
+            const parsed = parseJSONText(JSON.stringify({ status: 'ok', count: 2, data: [{ x: 1 }, { x: 2 }] }));
+            assertDeepEqual(parsed.columns, ['x']);
+            assertEqual(parsed.rows.length, 2);
+        });
+
+        test('invalid JSON says so rather than producing an empty table', () => {
+            let message = '';
+            try {
+                parseJSONText('{ not json ');
+            } catch (e) {
+                message = e.message;
+            }
+            assertTrue(/not valid JSON/.test(message), `expected a clear message, got "${message}"`);
+        });
+
+        function driversFor(rows) {
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['date', 'amount', 'region'], 'fixture.csv');
+            return analyzer.runAnalysis({
+                mapping: { metric_column: 'amount', timeline_column: 'date', entity_column: null, dimension_columns: ['region'] },
+                dimension_filters: {},
+                projection_target: 'value',
+                primary_dimension: 'region',
+                include_future_dates: true,
+                goals: [],
+                entity_view: 'all'
+            }).dimension_drivers;
+        }
+
+        test('dimension drivers report share of movement, not share of a near-zero net', () => {
+            const d = driversFor([
+                { date: '2024-01-10', amount: 1000, region: 'North' },
+                { date: '2024-01-10', amount: 5000, region: 'South' },
+                { date: '2024-02-10', amount: 6000, region: 'North' },
+                { date: '2024-02-10', amount: 200, region: 'South' }
+            ]);
+
+            assertClose(d.total_change, 200, 1e-9, 'net change');
+            assertClose(d.gross_change, 9800, 1e-9, 'gross change');
+            assertTrue(d.offsetting, 'opposite swings around a near-zero net should be flagged as offsetting');
+
+            const north = d.drivers.find(x => x.value === 'North');
+            const south = d.drivers.find(x => x.value === 'South');
+            assertClose(north.pct_of_gross_change, 5000 / 9800 * 100, 1e-9, 'North share');
+            assertClose(south.pct_of_gross_change, 4800 / 9800 * 100, 1e-9, 'South share');
+            assertEqual(north.direction, 'up');
+            assertEqual(south.direction, 'down');
+
+            for (const x of d.drivers) {
+                assertTrue(x.pct_of_gross_change >= 0 && x.pct_of_gross_change <= 100, `share out of range: ${x.pct_of_gross_change}`);
+                assertTrue(!('pct_of_total_change' in x), 'the unbounded net share must not be exposed');
+            }
+        });
+
+        test('dimension driver shares always total 100 percent of the movement', () => {
+            const d = driversFor([
+                { date: '2024-01-10', amount: 400, region: 'North' },
+                { date: '2024-01-10', amount: 900, region: 'South' },
+                { date: '2024-01-10', amount: 50, region: 'East' },
+                { date: '2024-02-10', amount: 410, region: 'North' },
+                { date: '2024-02-10', amount: 480, region: 'South' },
+                { date: '2024-02-10', amount: 520, region: 'East' }
+            ]);
+            const sum = d.drivers.reduce((t, x) => t + x.pct_of_gross_change, 0);
+            assertClose(sum, 100, 1e-9, 'shares should sum to 100');
+        });
+
+        test('dimension drivers keep the old net-share numbers when everything moves one way', () => {
+            const d = driversFor([
+                { date: '2024-01-10', amount: 1000, region: 'North' },
+                { date: '2024-01-10', amount: 1000, region: 'South' },
+                { date: '2024-02-10', amount: 1300, region: 'North' },
+                { date: '2024-02-10', amount: 1100, region: 'South' }
+            ]);
+
+            assertClose(d.total_change, 400, 1e-9, 'net change');
+            assertClose(d.gross_change, 400, 1e-9, 'gross equals net when signs agree');
+            assertTrue(!d.offsetting, 'a clean same-direction move is not offsetting');
+            assertClose(d.drivers.find(x => x.value === 'North').pct_of_gross_change, 75, 1e-9, 'North share');
+            assertClose(d.drivers.find(x => x.value === 'South').pct_of_gross_change, 25, 1e-9, 'South share');
+        });
+
+        test('entity split classifies New vs Repeat using the 30-day first-seen rule', () => {
+            const columns = ['date', 'amount', 'customer'];
+            const rows = [
+                { date: '2024-01-01', amount: 100, customer: 'Cust1' },
+                { date: '2024-01-05', amount: 200, customer: 'Cust2' },
+                { date: '2024-03-10', amount: 50, customer: 'Cust2' }
+            ];
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const res = analyzer.runAnalysis({
+                mapping: { metric_column: 'amount', timeline_column: 'date', entity_column: 'customer', dimension_columns: [] },
+                dimension_filters: {},
+                projection_target: 'value',
+                primary_dimension: null,
+                include_future_dates: true,
+                goals: [],
+                entity_view: 'all'
+            });
+
+            assertEqual(res.entity_split.classification_method, 'derived');
+            assertEqual(res.entity_split.new_count, 2, 'Cust1 and Cust2 each have at least one New row');
+            assertEqual(res.entity_split.repeat_count, 1, 'only Cust2 has a Repeat row');
+            assertEqual(res.entity_split.new_value, 300, '100 (Cust1) + 200 (Cust2 first purchase)');
+            assertEqual(res.entity_split.repeat_value, 50);
+        });
+
+        test('computeGoals classifies ahead / on_pace / behind / no_goal_set correctly', () => {
+            const columns = ['date', 'amount'];
+            const rows = [{ date: '2024-01-05', amount: 600 }];
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const workingRows = analyzer.buildWorkingRows('amount', 'date', null, []);
+            const anchor = d('2024-01-16');
+
+            const goals = [
+                { id: 'ahead', label: 'Ahead', period: 'monthly', scope_type: 'overall', target_value: 600 },
+                { id: 'on_pace', label: 'On Pace', period: 'monthly', scope_type: 'overall', target_value: 1200 },
+                { id: 'behind', label: 'Behind', period: 'monthly', scope_type: 'overall', target_value: 3000 },
+                { id: 'none', label: 'No Goal', period: 'monthly', scope_type: 'overall', target_value: 0 }
+            ];
+
+            const progress = analyzer.computeGoals(workingRows, null, 'value', goals, anchor);
+            const byId = Object.fromEntries(progress.map((g) => [g.id, g]));
+
+            assertEqual(byId.ahead.status, 'ahead');
+            assertEqual(byId.on_pace.status, 'on_pace');
+            assertEqual(byId.behind.status, 'behind');
+            assertEqual(byId.none.status, 'no_goal_set');
+        });
+
+        test('roundTarget rounds to a sensible magnitude based on size', () => {
+            const columns = ['date', 'amount'];
+            const analyzer = new BookOfBusinessAnalyzer([], columns, 'fixture.csv');
+            assertEqual(analyzer.roundTarget(1234), 1200);
+            assertEqual(analyzer.roundTarget(87), 87);
+            assertEqual(analyzer.roundTarget(0), 0);
+            assertEqual(analyzer.roundTarget(-5), 0);
+        });
+
+        test('detectTrendAnomalies flags a real spike but not a flat series', () => {
+            const columns = ['date', 'amount', 'region'];
+            const rows = [];
+            ['2024-01-05', '2024-02-05', '2024-03-05', '2024-04-05'].forEach((date) => {
+                rows.push({ date, amount: 1000, region: 'X' });
+            });
+            rows.push({ date: '2024-05-05', amount: 2000, region: 'X' });
+            ['2024-01-05', '2024-02-05', '2024-03-05', '2024-04-05', '2024-05-05'].forEach((date) => {
+                rows.push({ date, amount: 500, region: 'Y' });
+            });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const workingRows = analyzer.buildWorkingRows('amount', 'date', null, ['region']);
+            const flags = analyzer.detectTrendAnomalies(workingRows, null, 'value', 'region', 1000);
+
+            assertEqual(flags.length, 1, 'only the spiking region should be flagged');
+            assertEqual(flags[0].scope_value, 'X');
+            assertEqual(flags[0].direction, 'spike');
+        });
+
+        test('seasonalTrendForecast on a steady upward trend projects further growth with tight bands', () => {
+            const columns = ['date', 'amount'];
+            const rows = [];
+            let ord = 0;
+            for (let m = 1; m <= 12; m++) {
+                rows.push({ date: `2023-${String(m).padStart(2, '0')}-15`, amount: 1000 + m * 100 });
+            }
+            const analyzer = new BookOfBusinessAnalyzer(rows, columns, 'fixture.csv');
+            const workingRows = analyzer.buildWorkingRows('amount', 'date', null, []);
+            const monthly = analyzer.buildMonthlySeries(workingRows, null);
+            const { future, diagnostics } = analyzer.seasonalTrendForecast(monthly, 'value', 3);
+
+            assertEqual(future.length, 3);
+            assertTrue(diagnostics.r_squared > 0.99, `expected a near-perfect linear fit, got r2=${diagnostics.r_squared}`);
+            assertTrue(future[2].expected_value > future[0].expected_value, 'later months should project higher than earlier ones on an upward trend');
+            assertTrue(future[0].conservative_value <= future[0].expected_value && future[0].expected_value <= future[0].aggressive_value, 'conservative <= expected <= aggressive');
+        });
+
+        test('formatted numbers from a real export still parse as numbers', () => {
+            assertEqual(toNumber('1,234'), 1234, 'a thousands separator must not make a number into text');
+            assertEqual(toNumber('1,234,567'), 1234567, 'several separators');
+            assertEqual(toNumber('$1,234.50'), 1234.5, 'a currency symbol is formatting, not data');
+            assertEqual(toNumber('£99'), 99);
+            assertEqual(toNumber('45%'), 45, 'a percent sign is formatting too');
+            assertEqual(toNumber('(1,234)'), -1234, 'accounting negatives are negative');
+            assertEqual(toNumber('1 234'), 1234, 'space separated thousands');
+            assertEqual(toNumber(' 42 '), 42, 'padding is ignored');
+            assertEqual(toNumber('-99.5'), -99.5);
+            assertEqual(toNumber('1e3'), 1000, 'scientific notation still works');
+        });
+
+        test('things that only look like numbers are still refused', () => {
+            assertEqual(toNumber('CUST-0042'), null, 'an identifier is not a number');
+            assertEqual(toNumber('2024-01-15'), null, 'a date is not a number');
+            assertEqual(toNumber('12/31/2024'), null, 'nor is a slashed date');
+            assertEqual(toNumber('12,34'), null, 'a malformed group is refused rather than guessed');
+            assertEqual(toNumber('1.2.3'), null, 'a version string is not a number');
+            assertEqual(toNumber('N/A'), null);
+            assertEqual(toNumber('-'), null);
+            assertEqual(toNumber(''), null);
+            assertEqual(toNumber('abc'), null);
+        });
+
+        test('a column of formatted numbers is detected as the metric, not skipped', () => {
+            const rows = [];
+            for (let i = 0; i < 60; i++) {
+                rows.push({
+                    visit_date: `2024-${String((i % 12) + 1).padStart(2, '0')}-15`,
+                    patient_id: 'PT-' + (i % 20),
+                    department: ['Cardiology', 'Oncology'][i % 2],
+                    steps_walked: (1000 + i * 137).toLocaleString('en-US'),
+                    year: '2024',
+                    month: String((i % 12) + 1)
+                });
+            }
+
+            const columns = ['visit_date', 'patient_id', 'department', 'steps_walked', 'year', 'month'];
+            const schema = new BookOfBusinessAnalyzer(rows, columns, 'hospital.csv').inferSchema();
+
+            assertEqual(schema.inferred_mapping.metric_column, 'steps_walked', 'a comma formatted measure must beat bare year and month integers');
+            assertEqual(schema.inferred_mapping.timeline_column, 'visit_date', 'the real date column is the timeline');
+        });
+
+        test('a year and month pair becomes a usable timeline', () => {
+            const rows = [];
+            for (let i = 0; i < 36; i++) {
+                rows.push({ year: 2022 + Math.floor(i / 12), month: (i % 12) + 1, region: ['N', 'S'][i % 2], revenue: 1000 + i * 50 });
+            }
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['year', 'month', 'region', 'revenue'], 'ym.csv');
+            assertTrue(!!analyzer.syntheticPeriod, 'a period column is built');
+
+            const schema = analyzer.inferSchema();
+            assertEqual(schema.inferred_mapping.timeline_column, 'Period (built from year and month)', 'and becomes the timeline');
+            assertEqual(schema.inferred_mapping.metric_column, 'revenue', 'the real measure is still the metric');
+            assertEqual(rows[0]['Period (built from year and month)'], '2022-01-01', 'the first row is the first month');
+            assertEqual(rows[13]['Period (built from year and month)'], '2023-02-01', 'and it rolls over the year correctly');
+        });
+
+        test('month names work as well as month numbers', () => {
+            const names = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            const rows = [];
+            for (let i = 0; i < 24; i++) rows.push({ Year: '2023', Month: names[i % 12], score: 50 + i });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['Year', 'Month', 'score'], 'named.csv');
+            assertTrue(!!analyzer.syntheticPeriod, 'named months are understood');
+            assertEqual(rows[0]['Period (built from year and month)'], '2023-01-01');
+            assertEqual(rows[11]['Period (built from year and month)'], '2023-12-01', 'December lands in month 12');
+        });
+
+        test('a year and quarter pair also works', () => {
+            const rows = [];
+            for (let i = 0; i < 12; i++) rows.push({ year: 2024, quarter: 'Q' + ((i % 4) + 1), units: 10 + i });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['year', 'quarter', 'units'], 'q.csv');
+            assertTrue(!!analyzer.syntheticPeriod, 'quarters are understood');
+            assertEqual(rows[0]['Period (built from year and month)'], '2024-01-01', 'Q1 starts in January');
+            assertEqual(rows[3]['Period (built from year and month)'], '2024-10-01', 'Q4 starts in October');
+        });
+
+        test('a real date column is never overridden by a synthetic one', () => {
+            const rows = [];
+            for (let i = 0; i < 24; i++) rows.push({ order_date: '2024-01-15', year: 2024, month: 1, revenue: 100 + i });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['order_date', 'year', 'month', 'revenue'], 'hasdate.csv');
+            assertTrue(!analyzer.syntheticPeriod, 'nothing is invented when a date already exists');
+            assertEqual(rows[0]['Period (built from year and month)'], undefined, 'and no column is added to the rows');
+        });
+
+        test('a year on its own is not enough to invent a timeline', () => {
+            const rows = [];
+            for (let i = 0; i < 20; i++) rows.push({ year: 2020 + (i % 4), revenue: 100 + i });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['year', 'revenue'], 'yearonly.csv');
+            assertTrue(!analyzer.syntheticPeriod, 'a year with no month or quarter is refused');
+        });
+
+        test('a column merely named month with junk in it is refused', () => {
+            const rows = [];
+            for (let i = 0; i < 20; i++) rows.push({ year: 2024, month: 'not a month', revenue: 100 + i });
+
+            const analyzer = new BookOfBusinessAnalyzer(rows, ['year', 'month', 'revenue'], 'junk.csv');
+            assertTrue(!analyzer.syntheticPeriod, 'the name alone does not make it a month');
+        });
+
+        const passCount = results.filter((r) => r.pass).length;
+        const failCount = results.length - passCount;
+
+        const summaryEl = document.getElementById('summary');
+        summaryEl.innerHTML = `
+            <p class="text-sm font-semibold ${failCount === 0 ? 'text-emerald-600' : 'text-red-600'}">
+                ${passCount} / ${results.length} tests passed
+            </p>
+        `;
+
+        const resultsEl = document.getElementById('results');
+        resultsEl.innerHTML = results.map((r) => `
+            <div class="bg-white border ${r.pass ? 'border-slate-200' : 'border-red-300'} rounded-lg p-3 flex items-start gap-3">
+                <span class="text-[10px] font-bold px-1.5 py-0.5 rounded ${r.pass ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}">${r.pass ? 'PASS' : 'FAIL'}</span>
+                <div>
+                    <p class="text-sm text-slate-800">${r.name}</p>
+                    ${r.pass ? '' : `<p class="text-xs text-red-600 mt-1 font-mono">${r.error}</p>`}
+                </div>
+            </div>
+        `).join('');
+
+        console.log(`${passCount}/${results.length} tests passed`);
+        results.filter((r) => !r.pass).forEach((r) => console.error(`FAIL: ${r.name} — ${r.error}`));
+    </script>
+
+</body>
+</html>
