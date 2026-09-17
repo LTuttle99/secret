@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="studio.css">
   <link rel="stylesheet" href="source-guide.css">
   <link rel="stylesheet" href="intelligence.css">
+  <link rel="stylesheet" href="analyst.css">
   <script src="../shared/theme.js"></script>
 </head>
 <body>
@@ -45,6 +46,7 @@
         <button data-view="dictionary" class="nav-item"><span>Aa</span>Dictionary</button>
         <button data-view="quality" class="nav-item"><span>✓</span>Quality</button>
         <button data-view="intelligence" class="nav-item"><span>✦</span>Intelligence</button>
+        <button data-view="analyst" class="nav-item"><span>V</span>Analyst Lab</button>
         <button data-view="report" class="nav-item"><span>▤</span>Report</button>
         <button data-view="automate" class="nav-item"><span>↻</span>Automate</button>
         <button data-view="builder" class="nav-item"><span>＋</span>Tool Builder</button>
@@ -86,6 +88,68 @@
           <div class="surface-head"><div><span class="eyebrow">Quick start</span><h3>Common analytics recipes</h3></div></div>
           <div id="recipe-gallery" class="recipe-gallery"></div>
         </article>
+      </section>
+
+      <section id="view-analyst" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Vanessa analyst lab</span><h2>From raw data to a defensible decision</h2><p>Plan the work, review every change, explore evidence, model outcomes, and publish a story—all with an audit trail.</p></div><div class="completion-orb"><strong id="completion-score">0%</strong><span>project ready</span></div></div>
+        <div class="analyst-tabs" role="tablist" aria-label="Analyst Lab tools">
+          <button class="active" data-analyst-tab="copilot">Copilot</button><button data-analyst-tab="prepare">Prepare</button><button data-analyst-tab="explore">Explore</button><button data-analyst-tab="model">Model</button><button data-analyst-tab="story">Story</button><button data-analyst-tab="reproduce">Reproduce</button><button data-analyst-tab="organization">Organization</button>
+        </div>
+
+        <div id="analyst-copilot" class="analyst-panel active">
+          <div class="analyst-grid two">
+            <article class="surface copilot-card"><div class="vanessa-lockup"><span>V</span><div><span class="eyebrow light">Analyst Copilot</span><h3>Tell me the decision you need to make.</h3></div></div><form id="copilot-form" class="form-grid"><textarea id="copilot-goal" rows="4" placeholder="Example: I need to understand why applications declined and what our team should do next."></textarea><select id="copilot-audience"><option>Executive leadership</option><option>Operations team</option><option>Technical analysts</option><option>Public audience</option></select><select id="copilot-confidence"><option value="careful">Careful—ask before changing anything</option><option value="guided">Guided—prepare fixes for review</option><option value="fast">Fast—build the complete analysis plan</option></select><button class="button white">Build analysis plan</button></form><div id="copilot-response" class="copilot-response" hidden></div></article>
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">One-click packages</span><h3>Start from the decision</h3></div></div><div id="analysis-package-grid" class="package-grid"></div></article>
+          </div>
+          <article class="surface progress-surface"><div class="surface-head"><div><span class="eyebrow">Project completion</span><h3>What is ready—and what still needs work?</h3></div><button id="refresh-completion-btn" class="button ghost">Refresh score</button></div><div id="completion-checklist" class="completion-list"></div></article>
+        </div>
+
+        <div id="analyst-prepare" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Cleaning review queue</span><h3>Approve fixes before they happen</h3></div><button id="scan-cleaning-btn" class="button primary">Find issues</button></div><div id="cleaning-queue" class="review-queue"></div><div class="action-row prepare-actions"><button id="apply-cleaning-btn" class="button primary">Apply selected fixes</button><button id="undo-change-btn" class="button ghost">Undo last change</button></div></article>
+            <article class="surface"><span class="eyebrow">Version comparison</span><h3>What changed between files?</h3><div class="compare-selects"><select id="compare-before"></select><span>→</span><select id="compare-after"></select></div><div class="form-grid"><input id="compare-key" placeholder="Optional stable ID column"><button id="compare-btn" class="button primary">Compare versions</button></div><div id="compare-result" class="lab-result empty">Choose two datasets to compare rows, fields, and numeric movement.</div></article>
+          </div>
+          <article class="surface history-surface"><div class="surface-head"><div><span class="eyebrow">Reversible history</span><h3>Every Analyst Lab change</h3></div></div><div id="change-history" class="history-timeline"></div></article>
+        </div>
+
+        <div id="analyst-explore" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><span class="eyebrow">Exploration canvas</span><h3>Build a view from the fields</h3><div id="field-chips" class="field-chips"></div><div class="drop-layout"><label class="field-drop" data-drop-role="category">Category<select id="explore-category"></select></label><label class="field-drop" data-drop-role="value">Value<select id="explore-value"></select></label><label class="field-drop" data-drop-role="filter">Filter<select id="explore-filter"></select></label></div><button id="build-exploration-btn" class="button primary">Build view</button><div id="exploration-result" class="visual-result"></div></article>
+            <article class="surface"><span class="eyebrow">Geographic analysis</span><h3>Where is activity concentrated?</h3><button id="run-geography-btn" class="button primary">Detect locations</button><div id="geography-result" class="visual-result empty">Detects latitude/longitude, state, region, country, ZIP, and city fields.</div></article>
+          </div>
+          <article class="surface"><span class="eyebrow">Text analysis</span><h3>Turn open-ended responses into themes</h3><div class="inline-lab-form"><select id="text-column"></select><button id="run-text-analysis-btn" class="button primary">Analyze text</button></div><div id="text-analysis-result" class="text-insight-grid"></div></article>
+        </div>
+
+        <div id="analyst-model" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><span class="eyebrow">Forecast &amp; scenario lab</span><h3>Project what comes next</h3><div class="form-grid"><select id="forecast-value"></select><select id="forecast-time"></select><input id="forecast-periods" type="number" min="1" max="24" value="6" aria-label="Forecast periods"><label class="range-label">Scenario adjustment <strong id="scenario-label">0%</strong><input id="scenario-adjustment" type="range" min="-50" max="50" value="0"></label><button id="run-forecast-btn" class="button primary">Run forecast</button></div><div id="forecast-result" class="visual-result empty">Choose a measurable field and timeline.</div></article>
+            <article class="surface"><span class="eyebrow">Statistical test assistant</span><h3>Use the right test—and understand it</h3><div class="form-grid"><select id="stats-field-a"></select><select id="stats-field-b"></select><button id="run-stats-btn" class="button primary">Recommend and run test</button></div><div id="stats-result" class="lab-result empty">Vanessa selects correlation, group comparison, or frequency analysis based on the fields.</div></article>
+          </div>
+        </div>
+
+        <div id="analyst-story" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Executive story builder</span><h3>Situation → evidence → action</h3></div><button id="generate-story-btn" class="button primary">Generate story</button></div><div id="story-preview" class="story-preview empty">Generate a decision-ready narrative from the active project.</div></article>
+            <article class="surface"><span class="eyebrow">Presentation coach</span><h3>Walk into the room prepared</h3><button id="coach-presentation-btn" class="button primary">Create speaker notes</button><div id="coach-result" class="coach-list"></div></article>
+          </div>
+          <article class="surface"><div class="surface-head"><div><span class="eyebrow">Interactive report designer</span><h3>Choose the message and presentation</h3></div><div class="action-row"><button id="preview-designed-report-btn" class="button ghost">Preview</button><button id="export-designed-report-btn" class="button primary">Export HTML</button></div></div><div class="report-designer"><div class="designer-controls"><input id="designer-title" placeholder="Report title"><select id="designer-theme"><option value="executive">Executive navy</option><option value="editorial">Editorial cream</option><option value="modern">Modern blue</option></select><label><input type="checkbox" value="summary" checked> Executive summary</label><label><input type="checkbox" value="metrics" checked> Key metrics</label><label><input type="checkbox" value="quality" checked> Data quality</label><label><input type="checkbox" value="story" checked> Analysis story</label><label><input type="checkbox" value="actions" checked> Recommended actions</label></div><div id="designed-report-preview" class="designed-report"></div></div></article>
+        </div>
+
+        <div id="analyst-reproduce" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><span class="eyebrow">SQL workbench</span><h3>Query the active dataset</h3><textarea id="sql-query" class="code-input" rows="6" spellcheck="false">SELECT * FROM data LIMIT 10</textarea><div class="action-row"><button id="write-sql-btn" class="button ghost">Ask Vanessa to write it</button><button id="run-sql-btn" class="button primary">Run query</button></div><div id="sql-result" class="table-shell sql-result"></div></article>
+            <article class="surface"><span class="eyebrow">Reproducible code export</span><h3>Take the analysis with you</h3><div class="code-tabs"><button class="active" data-code-language="python">Python</button><button data-code-language="r">R</button><button data-code-language="sql">SQL</button></div><pre id="code-preview"></pre><button id="download-code-btn" class="button primary">Download code</button></article>
+          </div>
+          <article class="surface"><span class="eyebrow">Synthetic data generator</span><h3>Share the structure without sharing the people</h3><div class="inline-lab-form"><input id="synthetic-rows" type="number" min="10" max="5000" value="100" aria-label="Synthetic row count"><button id="generate-synthetic-btn" class="button primary">Create synthetic dataset</button></div><p class="muted">Produces new fake rows with similar types, ranges, categories, and missingness. Direct identifiers are replaced.</p><div id="synthetic-result" class="lab-result empty">The source dataset remains unchanged.</div></article>
+        </div>
+
+        <div id="analyst-organization" class="analyst-panel">
+          <div class="analyst-grid two">
+            <article class="surface"><span class="eyebrow">Deliverable quality gate</span><h3>Check before you publish</h3><button id="run-deliverable-check-btn" class="button primary">Run final review</button><div id="deliverable-checks" class="completion-list"></div></article>
+            <article class="surface"><span class="eyebrow">Guided learning mode</span><h3>Teach the reason behind each step</h3><div class="setting-row"><div><strong>Learning explanations</strong><span>Show what the step does, why it matters, and common mistakes.</span></div><label class="switch"><input id="learning-mode-toggle" type="checkbox"><span></span></label></div><div id="learning-card" class="learning-card"></div></article>
+          </div>
+          <article class="surface"><span class="eyebrow">Branded organization portal</span><h3>Make DataHub feel like your team</h3><div class="branding-grid"><input id="brand-name" placeholder="Organization or department"><input id="brand-primary" type="color" value="#00133c" aria-label="Primary brand color"><input id="brand-accent" type="color" value="#0062f1" aria-label="Accent brand color"><input id="brand-analyst-name" placeholder="Assistant name" value="Vanessa"><select id="brand-language"><option value="Dataset">Call data “Dataset”</option><option value="Workbook">Call data “Workbook”</option><option value="Evidence set">Call data “Evidence set”</option></select><button id="apply-brand-btn" class="button primary">Apply portal brand</button></div><div id="brand-preview" class="brand-preview"><span id="brand-preview-mark">D</span><div><strong id="brand-preview-name">DataHub</strong><small id="brand-preview-tagline">Trusted analytics workspace</small></div></div></article>
+        </div>
       </section>
 
       <section id="view-data" class="studio-view">
@@ -217,6 +281,7 @@
   <script src="../shared/parse.js"></script>
   <script src="studio.js"></script>
   <script src="intelligence.js"></script>
+  <script src="analyst.js"></script>
   <script src="../shared/platform.js"></script>
 </body>
 </html>

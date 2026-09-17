@@ -139,6 +139,13 @@ library's output through `tools/shared/sanitize.js` before rendering.
   anomaly monitoring, question-based analysis, dashboard planning, sensitive
   data scanning and redaction, review approvals, impact previews, project
   templates, database-gateway starter kits, and an organization readiness score.
+- **Vanessa Analyst Lab** — goal-driven analysis plans, one-click industry
+  packages, reversible cleaning suggestions, dataset-version comparison,
+  drag-and-drop exploration, geographic and text analysis, forecasting and
+  scenarios, statistical guidance, executive stories, report design,
+  presentation coaching, a safe SQL subset, Python/R/SQL exports, synthetic
+  data, final quality gates, guided learning, completion scoring, and portal
+  branding. Analyst Lab changes retain local undo snapshots for review.
 - **Guided data-source setup** — Vanessa asks where the data lives and gives a
   step-by-step preparation, permission, privacy, and connection walkthrough for
   local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,

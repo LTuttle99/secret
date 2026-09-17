@@ -118,11 +118,11 @@
   }
 
   function blankProject(name = "Untitled project") {
-    return { id: uid("project"), name, goal: "", createdAt: Date.now(), updatedAt: Date.now(), datasets: [], activeDatasetId: null, steps: [], rules: [], report: null, schedules: [], customTools: [], connections: [], members: [], comments: [], versions: [], activities: [{ text: "Project created", at: nowLabel() }], runs: [], mappings: [], joins: [], glossary: [], metrics: [], contracts: [], anomalies: [], privacyFindings: [], approvals: [], dashboardPlans: [], projectStatus: "Draft", readiness: null };
+    return { id: uid("project"), name, goal: "", createdAt: Date.now(), updatedAt: Date.now(), datasets: [], activeDatasetId: null, steps: [], rules: [], report: null, schedules: [], customTools: [], connections: [], members: [], comments: [], versions: [], activities: [{ text: "Project created", at: nowLabel() }], runs: [], mappings: [], joins: [], glossary: [], metrics: [], contracts: [], anomalies: [], privacyFindings: [], approvals: [], dashboardPlans: [], analystPlans: [], cleaningSuggestions: [], changeHistory: [], stories: [], reportDesigns: [], projectStatus: "Draft", readiness: null, learningMode: false, branding: null };
   }
 
   function normalizeProject(project) {
-    for (const key of ["datasets", "steps", "rules", "schedules", "customTools", "connections", "members", "comments", "versions", "activities", "runs", "mappings", "joins", "glossary", "metrics", "contracts", "anomalies", "privacyFindings", "approvals", "dashboardPlans"]) if (!Array.isArray(project[key])) project[key] = [];
+    for (const key of ["datasets", "steps", "rules", "schedules", "customTools", "connections", "members", "comments", "versions", "activities", "runs", "mappings", "joins", "glossary", "metrics", "contracts", "anomalies", "privacyFindings", "approvals", "dashboardPlans", "analystPlans", "cleaningSuggestions", "changeHistory", "stories", "reportDesigns"]) if (!Array.isArray(project[key])) project[key] = [];
     if (!project.name) project.name = "Untitled project";
     if (!project.projectStatus) project.projectStatus = "Draft";
     return project;

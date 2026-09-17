@@ -104,6 +104,7 @@
   function createJoin() {
     const stats = joinStats(); if (!stats) return studio.toast("Choose two different datasets and keys.");
     if (stats.cardinality === "many-to-many" && !confirm("This is a many-to-many join and can multiply rows. Create it anyway?")) return;
+    window.DataHubAnalyst?.checkpoint("Created joined dataset");
     const rightIndex = new Map(); stats.right.rows.forEach(row => { const key = String(row[stats.rightKey] ?? ""); if (!rightIndex.has(key)) rightIndex.set(key, []); rightIndex.get(key).push(row); });
     const rows = [];
     stats.left.rows.forEach(leftRow => {
@@ -274,6 +275,7 @@
     const allowed = new Set($$('.redaction-options input:checked').map(input => input.value));
     const byColumn = new Map(findings.filter(item => allowed.has(item.type)).map(item => [item.column, item.type]));
     if (!byColumn.size) return studio.toast("No selected sensitive fields were found.");
+    window.DataHubAnalyst?.checkpoint(`Redacted ${data.name}`);
     const copy = { id: studio.uid("dataset"), name: `${data.name} (redacted)`, rows: data.rows.map(row => Object.fromEntries(Object.entries(row).map(([key, value]) => [key, byColumn.has(key) ? redactValue(value, byColumn.get(key)) : value]))), source: `Redacted copy of ${data.name}`, importedAt: Date.now(), redacted: true };
     project().datasets.push(copy); project().activeDatasetId = copy.id; $("#redaction-result").className = "intel-result risk-low"; $("#redaction-result").innerHTML = `<strong>Safe copy created</strong><br>${byColumn.size} fields redacted across ${copy.rows.length} rows.`; touch("Redacted dataset copy created"); studio.renderAll();
   }
@@ -307,7 +309,7 @@
   }
   function renderTemplates() { $("#template-grid").innerHTML = templates.map((item, index) => `<div class="template-card"><h4>${esc(item.name)}</h4><p>${esc(item.detail)}</p><button class="button ghost" data-template="${index}">Use template</button></div>`).join(""); $$('[data-template]').forEach(button => button.onclick = () => applyTemplate(Number(button.dataset.template))); }
   function applyTemplate(index) {
-    const item = templates[index]; if (!item) return; project().goal = item.goal; $("#project-goal").value = item.goal;
+    const item = templates[index]; if (!item) return; window.DataHubAnalyst?.checkpoint(`Applied ${item.name} template`); project().goal = item.goal; $("#project-goal").value = item.goal;
     const stepDetails = { clean: "Trim text and remove fully blank rows", dedupe: "Keep one copy of identical rows", derive: "Add a useful calculated column", quality: "Evaluate the project rules", analyze: "Profile measures and categories", dashboard: "Open automatic dashboard creation", report: "Create an executive narrative" };
     project().steps = item.steps.map(id => ({ id: studio.uid("step"), type: id, name: id[0].toUpperCase() + id.slice(1), detail: stepDetails[id] || "Project workflow step" }));
     item.terms.forEach(([term, definition]) => { if (!project().glossary.some(entry => entry.term === term)) project().glossary.push({ id: studio.uid("term"), term, definition }); });
