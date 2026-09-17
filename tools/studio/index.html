@@ -25,6 +25,7 @@
   <link rel="stylesheet" href="evidence.css">
   <link rel="stylesheet" href="pulse.css">
   <link rel="stylesheet" href="command-center.css">
+  <link rel="stylesheet" href="portfolio.css">
   <script src="../shared/theme.js"></script>
 </head>
 <body>
@@ -59,6 +60,7 @@
         <button data-view="intelligence" data-mode-min="standard" class="nav-item"><span>✦</span>Intelligence</button>
         <button data-view="analyst" data-mode-min="guided" class="nav-item"><span>V</span>Analyst Lab</button>
         <button data-view="dashboard" data-mode-min="guided" class="nav-item"><span>▥</span>Dashboard</button>
+        <button data-view="portfolio" data-mode-min="standard" class="nav-item"><span>◈</span>Portfolio</button>
         <button data-view="operations" data-mode-min="standard" class="nav-item"><span>◎</span>Operations</button>
         <button data-view="report" data-mode-min="guided" class="nav-item"><span>▤</span>Report</button>
         <button data-view="automate" data-mode-min="standard" class="nav-item"><span>↻</span>Automate</button>
@@ -228,6 +230,15 @@
         <div class="dashboard-filterbar"><span>Global filter</span><select id="dashboard-filter-column"></select><select id="dashboard-filter-value"></select><button id="clear-dashboard-filter" class="icon-button">Clear</button></div>
         <div id="dashboard-canvas" class="dashboard-canvas"></div>
         <article class="surface formula-builder"><div class="surface-head"><div><span class="eyebrow">Visual formula builder</span><h3>Create a calculated field</h3></div></div><div class="formula-row"><input id="formula-name" placeholder="profit"><input id="formula-expression" placeholder="[revenue] - [cost]"><button id="add-formula-btn" class="button primary">Calculate</button></div><div id="formula-columns" class="formula-columns"></div><p class="fine-print">Use field names in brackets with +, −, ×, ÷, and parentheses. The result is added to the active dataset.</p></article>
+      </section>
+
+      <section id="view-portfolio" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Organization workspace</span><h2>Portfolio Center</h2><p>Find work across projects, govern datasets, reuse proven structures, and protect sensitive information.</p></div><button id="portfolio-search-btn" class="button primary">Search everything</button></div>
+        <div class="portfolio-tabs"><button class="active" data-portfolio-tab="catalog">Data catalog</button><button data-portfolio-tab="privacy">Privacy</button><button data-portfolio-tab="templates">Templates</button><button data-portfolio-tab="reliability">Reliability</button></div>
+        <div id="portfolio-catalog" class="portfolio-panel active"><article class="surface"><div class="surface-head"><div><span class="eyebrow">All projects</span><h3>Organization data catalog</h3></div><input id="catalog-search" placeholder="Filter datasets…"></div><div id="portfolio-summary" class="portfolio-summary"></div><div id="catalog-table" class="catalog-table"></div></article></div>
+        <div id="portfolio-privacy" class="portfolio-panel"><div class="portfolio-grid"><article class="surface"><div class="surface-head"><div><span class="eyebrow">Sensitive data</span><h3>Privacy scanner</h3></div><button id="run-privacy-scan" class="button primary">Scan active data</button></div><div id="portfolio-privacy-findings" class="privacy-findings"></div></article><article class="surface"><span class="eyebrow">Safe sharing</span><h3>Create a redacted copy</h3><select id="redaction-mode"><option value="mask">Mask detected values</option><option value="hash">Replace with stable hashes</option><option value="remove">Remove sensitive fields</option></select><button id="portfolio-redact-dataset-btn" class="button primary full">Create protected dataset</button><p class="fine-print">The original dataset remains unchanged.</p></article></div></div>
+        <div id="portfolio-templates" class="portfolio-panel"><div class="portfolio-grid"><article class="surface"><span class="eyebrow">Reusable work</span><h3>Save this project as a template</h3><input id="template-name" placeholder="Monthly performance review"><textarea id="template-description" rows="3" placeholder="When should your team use this?"></textarea><button id="save-template-btn" class="button primary full">Save template</button></article><article class="surface"><div class="surface-head"><div><span class="eyebrow">Template library</span><h3>Start from a proven structure</h3></div></div><div id="template-library" class="template-library"></div></article></div></div>
+        <div id="portfolio-reliability" class="portfolio-panel"><article class="surface"><div class="surface-head"><div><span class="eyebrow">Platform health</span><h3>Reliability Center</h3></div><button id="run-reliability-btn" class="button primary">Run checks</button></div><div id="reliability-score" class="reliability-score"></div><div id="reliability-checks" class="reliability-checks"></div></article></div>
       </section>
 
       <section id="view-data" class="studio-view">
@@ -429,6 +440,7 @@
   <script src="evidence.js"></script>
   <script src="pulse.js"></script>
   <script src="command-center.js"></script>
+  <script src="portfolio.js"></script>
   <script src="../shared/platform.js"></script>
 </body>
 </html>
