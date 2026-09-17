@@ -1,0 +1,18 @@
+{
+  "name": "Data and Analytics Hub",
+  "short_name": "DataHub",
+  "description": "Private, browser-based tools for analysis, cleaning, dashboards, statistics, and developer workflows.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#00133c",
+  "icons": [
+    {
+      "src": "datahub-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

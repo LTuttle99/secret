@@ -113,15 +113,24 @@ library's output through `tools/shared/sanitize.js` before rendering.
 
 ## Hub features
 
+- **Vanessa tool finder and workflows** — describe an outcome in plain English
+  and Vanessa either recommends one tool, asks a focused follow-up question, or
+  lays out a multi-tool sequence.
+- **Shared workspace** — a file dropped on the hub is stored in IndexedDB and can
+  be loaded into file-based tools without selecting it again. It never leaves
+  the browser. Every tool also has a safe sample-data shortcut.
+- **Task bundles** — common jobs such as monthly reporting, data quality, survey
+  analysis, and dashboard creation open as guided multi-tool workflows.
+- **Platform controls** — the floating control bar provides the command center,
+  workspace status, a unified export center, and theme control on every page.
+- **Installable app** — `manifest.webmanifest` and `service-worker.js` allow the
+  hub to be installed and cache visited pages for more resilient repeat use.
+- **Progressive controls** — sections explicitly labeled as advanced, options,
+  settings, or configuration begin collapsed and can be revealed when needed.
 - **Search** — the search box on the landing page filters cards by name and
   description as you type; empty categories hide themselves automatically.
-- **Command palette** — Ctrl+K (Cmd+K on Mac) opens a jump-to-tool box with
-  arrow-key navigation. It only ever lists tools the current access code
-  unlocks.
-- **Recently used** — the last five tools opened appear as chips at the top of
-  the hub, stored in `localStorage` under `hub_recent_tools` and filtered to
-  the current code's tools. This is the one thing the hub remembers between
-  visits; the access code itself is still never stored.
+- **Command center** — Ctrl+K (Cmd+K on Mac) searches every tool and runs global actions such as sample data, theme changes, and PDF export.
+- **Recently used and continue** — recent tools, favorites, and the preferred card/compact layout are remembered locally in the browser.
 - **Categories** — tools are grouped into four sections by what you are trying
   to do: "Explore & Analyze", "Clean & Combine", "Generate & Encode", and
   "Text & Dev Utilities". Sections with no visible tools hide themselves.
@@ -140,39 +149,6 @@ library's output through `tools/shared/sanitize.js` before rendering.
   None of them carry your data.) Update the headline/blurb
   and `href` directly in the root `index.html` whenever you want to change
   what it points to.
-- **Access code gate** — every visit (and every refresh) opens on a
-  full-screen black keypad ("Enter Access Code") that covers the whole hub;
-  nothing behind it is reachable until a valid numeric code is entered.
-  Wrong codes shake and clear; there's no "skip" or "show all" control.
-  Each code unlocks only the tools assigned to it — the `VIEW_CODES` object
-  in the `<script>` at the bottom of the root `index.html` maps each code to
-  a label and a list of `data-tool` ids (visible as a `data-tool="..."`
-  attribute on every card in the HTML). Current codes:
-
-  | Code | View | Tools |
-  |---|---|---|
-  | `1159` | Data Analyst | all tools |
-  | `7284` | Leadership | Data Analyzer, Instant Dashboard, Dashboard Builder, Pivot & Chart Explorer, Chart Builder, Statistical Tests |
-  | `5931` | Marketing | QR Generator, Color Tools, Markdown Previewer, Text Analyzer, Chart Builder, Instant Dashboard, Dashboard Builder |
-  | `4067` | IT / Dev | JSON Formatter, Regex Tester, Base64/URL Encoder, Timestamp Converter, Text Diff, File Diff, SQL Workbench, Code Helper, JWT Decoder, Test Data Generator, Instant Dashboard, Dashboard Builder |
-  | `8412` | HR / Operations | Data Cleaner, Format Converter, Column Statistics, Timestamp Converter, Lookup & Merge, Fuzzy Duplicate Finder, Instant Dashboard, Dashboard Builder, Statistical Tests |
-  | `2650` | Finance | Data Analyzer, Column Statistics, Pivot & Chart Explorer, File Diff, SQL Workbench, Lookup & Merge, Chart Builder, Instant Dashboard, Dashboard Builder, Statistical Tests |
-
-  Dashboard Builder is on every code on the assumption that anyone might want to
-  request a dashboard. Trim it out of any view where that is not true.
-
-  A code is not remembered anywhere (no `localStorage`, no URL param), so it
-  has to be re-entered on every fresh load by design, and there's no way to
-  switch views without refreshing and re-entering a (possibly different)
-  code.
-
-  **This is a convenience filter, not access control.** It only covers the
-  landing page — anyone who knows or guesses a tool's direct URL (e.g.
-  `tools/data-analyzer/index.html`) can open it directly, bypassing the
-  gate entirely, since there's no backend to actually check credentials
-  against. Real per-person restriction would need a server with
-  authentication, which is a different architecture than this static site.
-
 ## Statistical Tests (`tools/stat-tests/`)
 
 Six tests over a loaded file, each reporting the statistic, its degrees of freedom, a p

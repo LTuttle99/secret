@@ -127,6 +127,8 @@
         }
     </style>
     <script src="tools/shared/theme.js"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="tools/shared/platform.css">
 </head>
 
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
@@ -948,17 +950,38 @@
             }).sort((a, b) => b.score - a.score)[0];
         }
 
+        function findWorkflow(query) {
+            const q = query.toLowerCase();
+            if (/monthly|report|recurring/.test(q)) return ['data-cleaner', 'data-analyzer', 'dashboard-builder'];
+            if (/quality|messy|duplicate|clean/.test(q)) return ['column-stats', 'data-cleaner', 'fuzzy-dupes'];
+            if (/survey|responses|questionnaire/.test(q)) return ['text-analyzer', 'stat-tests', 'chart-builder'];
+            if (/compare|changed|difference/.test(q)) return ['file-diff', 'data-analyzer'];
+            if (/merge|combine|join|lookup/.test(q)) return ['data-cleaner', 'lookup-merge', 'column-stats'];
+            if (/dashboard|visual|present|report/.test(q)) return ['data-cleaner', 'instant-dashboard', 'dashboard-builder'];
+            if (/forecast|trend|predict|anomaly/.test(q)) return ['data-cleaner', 'data-analyzer', 'chart-builder'];
+            return [];
+        }
+
         document.getElementById('tool-finder-form').addEventListener('submit', (event) => {
             event.preventDefault();
+            const form = event.currentTarget;
             const input = document.getElementById('tool-finder-input');
             const result = document.getElementById('finder-result');
             const query = input.value.trim();
             if (!query) { input.focus(); return; }
             const match = findBestTool(query);
             const card = match.card;
+            const workflow = findWorkflow(query).map(cardFor).filter(Boolean);
             result.classList.remove('hidden');
-            result.innerHTML = `<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa recommends</p><p class="mt-1 text-lg font-semibold">${toolTitle(card)}</p><p class="mt-1 text-sm text-slate-300">${match.score > 0 ? 'This is the closest match for what you described.' : 'I’m not completely sure, but this is the best place to start.'}</p></div><a href="${card.getAttribute('href')}" data-finder-tool="${card.dataset.tool}" class="shrink-0 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#00133C] hover:bg-blue-50">Take me there →</a></div>`;
-            result.querySelector('[data-finder-tool]').addEventListener('click', () => recordRecent(card.dataset.tool));
+            if (workflow.length > 1) {
+                result.innerHTML = `<div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa’s recommended workflow</p><div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">${workflow.map((step, index) => `<a href="${step.getAttribute('href')}" data-finder-tool="${step.dataset.tool}" class="group flex flex-1 items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-3 hover:bg-white/15"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-xs font-bold text-[#00133C]">${index + 1}</span><span><strong class="block text-sm">${toolTitle(step)}</strong><span class="text-xs text-slate-300">${index === 0 ? 'Start here' : 'Then continue'}</span></span></a>`).join('<span class="hidden self-center text-blue-200 sm:block">→</span>')}</div></div>`;
+            } else if (match.score < 4) {
+                result.innerHTML = `<div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">One quick question</p><p class="mt-1 text-base font-semibold">What kind of result do you want?</p><div class="mt-3 flex flex-wrap gap-2"><button data-followup="compare two versions of my file" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Find changes</button><button data-followup="clean and fix problems in my data" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Clean it</button><button data-followup="analyze trends and create insights" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Analyze it</button><button data-followup="build a dashboard to share" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Build a dashboard</button></div></div>`;
+                result.querySelectorAll('[data-followup]').forEach(button => button.addEventListener('click', () => { input.value = `${query} — ${button.dataset.followup}`; form.requestSubmit(); }));
+            } else {
+                result.innerHTML = `<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa recommends</p><p class="mt-1 text-lg font-semibold">${toolTitle(card)}</p><p class="mt-1 text-sm text-slate-300">This is the closest match for what you described.</p></div><a href="${card.getAttribute('href')}" data-finder-tool="${card.dataset.tool}" class="shrink-0 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#00133C] hover:bg-blue-50">Take me there →</a></div>`;
+            }
+            result.querySelectorAll('[data-finder-tool]').forEach(link => link.addEventListener('click', () => recordRecent(link.dataset.finderTool)));
         });
 
         document.querySelectorAll('.view-button').forEach((button) => button.addEventListener('click', () => {
@@ -1048,14 +1071,6 @@
             if (e.target === paletteOverlay) closePalette();
         });
 
-        document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-                e.preventDefault();
-                if (paletteOverlay.classList.contains('hidden')) openPalette();
-                else closePalette();
-            }
-        });
-
         decorateCatalog();
         buildCategoryFilters();
         initStatusBadges();
@@ -1102,5 +1117,6 @@
     <script src="tools/shared/vanessa-knowledge.js"></script>
     <script src="tools/shared/vanessa.js"></script>
 
+    <script src="tools/shared/platform.js"></script>
 </body>
 </html>
