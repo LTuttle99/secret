@@ -1,9 +1,10 @@
-const CACHE = "datahub-platform-v7";
+const CACHE = "datahub-platform-v11";
 const CORE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./datahub-icon.svg",
+  "./hub-neon.css",
   "./tools/shared/platform.css",
   "./tools/shared/platform.js",
   "./tools/shared/theme.js",
@@ -14,7 +15,16 @@ const CORE = [
   "./tools/studio/intelligence.css",
   "./tools/studio/intelligence.js",
   "./tools/studio/analyst.css",
-  "./tools/studio/analyst.js"
+  "./tools/studio/analyst.js",
+  "./tools/studio/collaboration.css",
+  "./tools/studio/collaboration.js",
+  "./tools/studio/operations.css",
+  "./tools/studio/operations.js",
+  "./tools/studio/experience.css",
+  "./tools/studio/experience.js",
+  "./tools/studio/neon.css",
+  "./tools/studio/evidence.css",
+  "./tools/studio/evidence.js"
 ];
 
 self.addEventListener("install", event => {

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#00133c">
+  <meta name="theme-color" content="#07050b">
   <title>DataHub Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -18,6 +18,11 @@
   <link rel="stylesheet" href="source-guide.css">
   <link rel="stylesheet" href="intelligence.css">
   <link rel="stylesheet" href="analyst.css">
+  <link rel="stylesheet" href="collaboration.css">
+  <link rel="stylesheet" href="operations.css">
+  <link rel="stylesheet" href="experience.css">
+  <link rel="stylesheet" href="neon.css">
+  <link rel="stylesheet" href="evidence.css">
   <script src="../shared/theme.js"></script>
 </head>
 <body>
@@ -31,25 +36,30 @@
       </div>
     </div>
     <div class="project-controls">
+      <label class="mode-control" title="Choose how many tools are visible"><span>Workspace</span><select id="workspace-mode" aria-label="Workspace mode"><option value="guided">Guided</option><option value="standard">Standard</option><option value="expert">All tools</option></select></label>
       <select id="project-select" aria-label="Current project"></select>
+      <button id="open-command-btn" class="button ghost command-launch" aria-keyshortcuts="Control+K Meta+K">Search <kbd>⌘K</kbd></button>
+      <button id="open-chat-btn" class="button ghost chat-launch">Chat <span id="chat-unread" hidden>0</span></button>
       <button id="new-project-btn" class="button ghost">New project</button>
       <button id="save-project-btn" class="button primary">Save</button>
+      <span id="save-status" class="save-status" aria-live="polite">Saved</span>
     </div>
   </header>
 
   <div class="studio-shell">
     <aside class="studio-sidebar" aria-label="Studio sections">
       <nav id="studio-nav">
-        <button data-view="overview" class="nav-item active"><span>⌂</span>Overview</button>
-        <button data-view="data" class="nav-item"><span>▦</span>Data</button>
-        <button data-view="workflow" class="nav-item"><span>⌁</span>Workflow</button>
-        <button data-view="dictionary" class="nav-item"><span>Aa</span>Dictionary</button>
-        <button data-view="quality" class="nav-item"><span>✓</span>Quality</button>
-        <button data-view="intelligence" class="nav-item"><span>✦</span>Intelligence</button>
-        <button data-view="analyst" class="nav-item"><span>V</span>Analyst Lab</button>
-        <button data-view="report" class="nav-item"><span>▤</span>Report</button>
-        <button data-view="automate" class="nav-item"><span>↻</span>Automate</button>
-        <button data-view="builder" class="nav-item"><span>＋</span>Tool Builder</button>
+        <button data-view="overview" data-mode-min="guided" class="nav-item active"><span>⌂</span>Overview</button>
+        <button data-view="data" data-mode-min="guided" class="nav-item"><span>▦</span>Data</button>
+        <button data-view="workflow" data-mode-min="standard" class="nav-item"><span>⌁</span>Workflow</button>
+        <button data-view="dictionary" data-mode-min="expert" class="nav-item"><span>Aa</span>Dictionary</button>
+        <button data-view="quality" data-mode-min="standard" class="nav-item"><span>✓</span>Quality</button>
+        <button data-view="intelligence" data-mode-min="standard" class="nav-item"><span>✦</span>Intelligence</button>
+        <button data-view="analyst" data-mode-min="guided" class="nav-item"><span>V</span>Analyst Lab</button>
+        <button data-view="operations" data-mode-min="standard" class="nav-item"><span>◎</span>Operations</button>
+        <button data-view="report" data-mode-min="guided" class="nav-item"><span>▤</span>Report</button>
+        <button data-view="automate" data-mode-min="standard" class="nav-item"><span>↻</span>Automate</button>
+        <button data-view="builder" data-mode-min="expert" class="nav-item"><span>＋</span>Tool Builder</button>
       </nav>
       <div class="sidebar-status">
         <span class="status-dot"></span>
@@ -65,6 +75,8 @@
         </div>
 
         <div class="metric-grid" id="overview-metrics"></div>
+
+        <article id="next-step-card" class="next-step-card" aria-live="polite"></article>
 
         <div class="overview-grid">
           <article class="surface hero-surface">
@@ -152,6 +164,46 @@
         </div>
       </section>
 
+      <section id="view-operations" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Analytics operations</span><h2>Turn evidence into accountable work</h2><p>Manage assignments, decisions, requests, governance, meetings, published assets, and live collaboration from one command center.</p></div><div class="ops-health"><strong id="ops-health-score">0</strong><span>health</span></div></div>
+        <div class="ops-tabs" role="tablist" aria-label="Operations tools"><button class="active" data-ops-tab="work">Work</button><button data-ops-tab="collaborate">Collaborate</button><button data-ops-tab="intake">Intake</button><button data-ops-tab="govern">Govern</button><button data-ops-tab="agents">Agents &amp; meetings</button><button data-ops-tab="portal">Portal</button><button data-ops-tab="extensions">Extensions</button></div>
+
+        <div id="ops-work" class="ops-panel active">
+          <div class="ops-grid three"><article class="surface"><div class="surface-head"><div><span class="eyebrow">Action items</span><h3>Who owns the next move?</h3></div><button id="add-task-btn" class="button primary">Add task</button></div><div id="task-board" class="ops-list"></div></article><article class="surface"><div class="surface-head"><div><span class="eyebrow">Decision log</span><h3>What did we decide?</h3></div><button id="add-decision-btn" class="button primary">Record</button></div><div id="decision-list" class="ops-list"></div></article><article class="surface"><div class="surface-head"><div><span class="eyebrow">Data issues</span><h3>What needs investigation?</h3></div><button id="add-issue-btn" class="button primary">Flag issue</button></div><div id="issue-list" class="ops-list"></div></article></div>
+          <div class="ops-grid two ops-row"><article class="surface"><span class="eyebrow">Evidence annotations</span><h3>Comment on the exact thing</h3><div class="form-grid"><select id="annotation-target"></select><textarea id="annotation-text" rows="2" placeholder="What should teammates know about this field, metric, chart, or workflow step?"></textarea><button id="add-annotation-btn" class="button primary">Add annotation</button></div><div id="annotation-list" class="ops-list"></div></article><article class="surface"><span class="eyebrow">Notification center</span><h3>Mentions, assignments, changes, and alerts</h3><div class="action-row"><button id="mark-notifications-btn" class="button ghost">Mark all read</button><button id="evaluate-alerts-btn" class="button primary">Check alerts</button></div><div id="notification-list" class="ops-list"></div></article></div>
+          <article class="surface ops-row"><span class="eyebrow">Threshold monitoring</span><h3>Create an in-app alert</h3><div class="ops-inline five"><input id="alert-name" placeholder="Alert name"><select id="alert-field"></select><select id="alert-operator"><option value="gt">Greater than</option><option value="lt">Less than</option><option value="missing">Missing rate above</option><option value="change">Change exceeds %</option></select><input id="alert-value" type="number" placeholder="Threshold"><button id="add-alert-btn" class="button primary">Add alert</button></div><div id="alert-list" class="ops-list horizontal"></div></article>
+        </div>
+
+        <div id="ops-collaborate" class="ops-panel">
+          <div class="ops-grid two"><article class="surface"><div class="surface-head"><div><span class="eyebrow">Shared evidence canvas</span><h3>Arrange the working session</h3></div><div class="action-row"><button id="add-canvas-note-btn" class="button ghost">Add note</button><button id="add-canvas-metric-btn" class="button ghost">Add metric</button></div></div><div id="shared-canvas" class="shared-canvas"></div><p class="fine-print">Drag cards to organize them. Updates sync between tabs and through the connected Live Room.</p></article><article class="surface"><span class="eyebrow">People and roles</span><h3>Project access model</h3><div class="ops-inline role-form"><input id="role-name" placeholder="Teammate"><select id="role-type"><option>Owner</option><option>Analyst</option><option>Reviewer</option><option>Contributor</option><option>Viewer</option></select><button id="add-role-btn" class="button primary">Add</button></div><div id="role-list" class="ops-list"></div><div class="permission-note">Roles document intended access locally. Enforced authentication requires the optional live backend or another identity provider.</div></article></div>
+          <div class="ops-grid two ops-row"><article class="surface"><span class="eyebrow">Secure share</span><h3>Create a password-protected read-only report</h3><div class="form-grid"><input id="share-title" placeholder="Shared report title"><input id="share-passphrase" type="password" placeholder="Passphrase (8+ characters)"><button id="create-secure-share-btn" class="button primary">Download encrypted share</button></div><p class="fine-print">Encryption happens in this browser using AES-GCM. Send the HTML file and passphrase separately.</p></article><article class="surface"><span class="eyebrow">Project branching</span><h3>Experiment without disturbing the main analysis</h3><div class="ops-inline"><input id="branch-name" placeholder="Scenario or branch name"><button id="create-branch-btn" class="button primary">Create branch</button></div><div id="branch-list" class="ops-list"></div></article></div>
+          <article class="surface ops-row"><span class="eyebrow">Complete audit trail</span><h3>Who changed what—and when?</h3><div id="audit-list" class="audit-table"></div></article>
+        </div>
+
+        <div id="ops-intake" class="ops-panel">
+          <div class="ops-grid two"><article class="surface"><span class="eyebrow">Data request portal</span><h3>Start with a well-framed request</h3><form id="request-form" class="form-grid"><input id="request-title" placeholder="Analysis request"><textarea id="request-decision" rows="2" placeholder="What decision will this support?"></textarea><input id="request-owner" placeholder="Requester / owner"><input id="request-due" type="date"><select id="request-output"><option>Dashboard</option><option>Executive report</option><option>Clean dataset</option><option>Statistical analysis</option><option>Presentation</option></select><button class="button primary">Submit request</button></form><div id="request-list" class="ops-list"></div></article><article class="surface"><span class="eyebrow">Data collection forms</span><h3>Collect structured evidence</h3><div class="form-grid"><input id="form-name" placeholder="Form name"><input id="form-fields" placeholder="Fields separated by commas"><button id="create-form-btn" class="button primary">Build form</button></div><div id="form-list" class="ops-list"></div><div id="form-runner" class="form-runner empty">Choose a form to preview and collect a response.</div></article></div>
+          <article class="surface ops-row"><span class="eyebrow">Scheduled delivery</span><h3>Prepare reports automatically when Studio opens</h3><div class="ops-inline six"><input id="delivery-name" placeholder="Delivery name"><select id="delivery-format"><option value="html">HTML report</option><option value="json">Project snapshot</option><option value="csv">Active dataset CSV</option></select><select id="delivery-frequency"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select><input id="delivery-date" type="date"><select id="delivery-destination"><option value="download">Export center</option><option value="live">Live room notice</option></select><button id="add-delivery-btn" class="button primary">Schedule</button></div><div id="delivery-list" class="ops-list horizontal"></div><p class="fine-print">Static hosting cannot run while closed. Due deliveries are prepared the next time Studio opens; a server scheduler can be connected later.</p></article>
+        </div>
+
+        <div id="ops-govern" class="ops-panel">
+          <div class="ops-grid two"><article class="surface"><span class="eyebrow">Visual lineage</span><h3>Source → decision</h3><div id="lineage-map" class="lineage-map"></div></article><article class="surface"><span class="eyebrow">Metric ownership</span><h3>Who certifies each KPI?</h3><div id="metric-registry" class="ops-list"></div></article></div>
+          <div class="ops-grid two ops-row"><article class="surface"><span class="eyebrow">Organization knowledge base</span><h3>Definitions, policies, and reporting knowledge</h3><div class="ops-inline"><input id="knowledge-title" placeholder="Knowledge title"><select id="knowledge-type"><option>Definition</option><option>Policy</option><option>Procedure</option><option>Source note</option></select><button id="add-knowledge-btn" class="button primary">Add</button></div><textarea id="knowledge-content" rows="3" placeholder="Approved guidance"></textarea><input id="knowledge-search" placeholder="Search knowledge"><div id="knowledge-list" class="ops-list"></div></article><article class="surface"><span class="eyebrow">Data health center</span><h3>Portfolio readiness</h3><div id="health-center" class="health-grid"></div></article></div>
+        </div>
+
+        <div id="ops-agents" class="ops-panel">
+          <div class="ops-grid two"><article class="surface"><div class="surface-head"><div><span class="eyebrow">Analytics agent council</span><h3>Independent reviews of the project</h3></div><button id="run-agent-council-btn" class="button primary">Run council</button></div><div id="agent-grid" class="agent-grid"></div></article><article class="surface"><span class="eyebrow">Meeting mode</span><h3>Run the decision meeting</h3><div class="form-grid"><input id="meeting-title" placeholder="Meeting title"><textarea id="meeting-agenda" rows="2" placeholder="Agenda items, separated by lines"></textarea><button id="start-meeting-btn" class="button primary">Start meeting</button></div><div id="meeting-room" class="meeting-room empty">Start a meeting to capture notes, actions, questions, and decisions.</div></article></div>
+          <article class="surface ops-row"><span class="eyebrow">Voice collaboration</span><h3>Dictate notes, tasks, requests, or chat messages</h3><div class="voice-console"><select id="voice-target"><option value="chat">Project chat</option><option value="task">New action item</option><option value="meeting">Meeting notes</option><option value="request">Analysis request</option></select><button id="voice-start-btn" class="voice-button">● Start listening</button><button id="voice-read-btn" class="button ghost">Read project briefing</button><span id="voice-status">Speech recognition availability will be detected in this browser.</span></div></article>
+        </div>
+
+        <div id="ops-portal" class="ops-panel">
+          <div class="ops-grid two"><article class="surface"><span class="eyebrow">Analytics portal</span><h3>Approved dashboards, reports, metrics, and datasets</h3><div class="ops-inline"><select id="portal-asset-type"><option>Report</option><option>Dashboard</option><option>Metric</option><option>Dataset</option></select><input id="portal-asset-title" placeholder="Published asset title"><button id="add-portal-asset-btn" class="button primary">Add asset</button></div><div id="portal-assets" class="portal-grid"></div><button id="export-portal-btn" class="button primary">Export internal portal</button></article><article class="surface"><span class="eyebrow">Published experience</span><h3>Preview the organization catalog</h3><div id="portal-preview" class="portal-preview"></div></article></div>
+        </div>
+
+        <div id="ops-extensions" class="ops-panel">
+          <article class="surface"><span class="eyebrow">Connector marketplace</span><h3>Install guided integrations and analysis packs</h3><div class="market-filters"><button class="active" data-market-filter="all">All</button><button data-market-filter="data">Data</button><button data-market-filter="business">Business</button><button data-market-filter="research">Research</button></div><div id="connector-market" class="connector-market"></div></article>
+        </div>
+      </section>
+
       <section id="view-data" class="studio-view">
         <div class="view-heading"><div><span class="eyebrow">Multi-file workspace</span><h2>Data catalog</h2><p>Drop files together. Studio profiles their schemas and suggests relationships.</p></div><div class="action-row"><label class="button ghost file-button">Choose folder<input id="studio-folder-input" type="file" webkitdirectory multiple hidden></label><button id="sample-project-btn" class="button ghost">Load sample project</button></div></div>
         <article class="source-guide-card">
@@ -169,7 +221,9 @@
           <div class="surface-head"><div><span class="eyebrow">Live connections</span><h3>Connect a public data source</h3></div></div>
           <div class="inline-form"><select id="connector-type"><option value="google">Public Google Sheet</option><option value="http">CSV or JSON URL</option><option value="database">Database gateway</option></select><input id="connector-url" type="url" placeholder="Paste a public link"><button id="connect-btn" class="button primary">Connect</button></div>
           <p id="connector-note" class="fine-print">Connections refresh when this project opens. Private databases require an HTTPS gateway because GitHub Pages cannot open database sockets.</p>
+          <div class="connection-actions"><button id="diagnose-connection-btn" class="button ghost">Diagnose connection</button><div id="connection-diagnosis" class="connection-diagnosis" hidden></div></div>
         </article>
+        <article id="change-briefing-panel" class="surface change-briefing-panel" hidden><div class="surface-head"><div><span class="eyebrow">What changed?</span><h3>Dataset update briefing</h3></div><button id="dismiss-change-briefing" class="icon-button">Dismiss</button></div><div id="change-briefing-content"></div></article>
       </section>
 
       <section id="view-workflow" class="studio-view">
@@ -253,6 +307,7 @@
 
       <section id="view-report" class="studio-view">
         <div class="view-heading"><div><span class="eyebrow">Executive output</span><h2>Report Studio</h2><p>Turn the current project into a concise narrative with evidence and recommendations.</p></div><div class="action-row"><button id="generate-report-btn" class="button primary">Generate report</button><button id="present-report-btn" class="button ghost">Present</button><button id="download-pptx-btn" class="button ghost">PowerPoint</button><button id="download-report-btn" class="button ghost">HTML</button></div></div>
+        <article id="evidence-explorer" class="surface evidence-explorer"><div class="surface-head"><div><span class="eyebrow">Traceable findings</span><h3>Click any insight to inspect the evidence</h3></div><button id="refresh-evidence-btn" class="button ghost">Refresh findings</button></div><div id="evidence-findings" class="evidence-findings"></div></article>
         <article id="report-canvas" class="report-canvas"></article>
       </section>
 
@@ -278,10 +333,72 @@
   <div id="studio-dialog" class="dialog-shell" hidden><div class="dialog-card"><button class="dialog-close" aria-label="Close">×</button><div id="dialog-content"></div></div></div>
   <div id="studio-toast" class="studio-toast" hidden></div>
 
+  <div id="command-palette" class="command-palette" hidden>
+    <div class="command-card" role="dialog" aria-modal="true" aria-labelledby="command-title">
+      <div class="command-search"><span>⌕</span><input id="command-input" autocomplete="off" placeholder="Search tools and actions…" aria-label="Search Studio"><kbd>Esc</kbd></div>
+      <div class="command-meta"><strong id="command-title">Go anywhere</strong><span>↑↓ move · Enter open</span></div>
+      <div id="command-results" class="command-results" role="listbox"></div>
+    </div>
+  </div>
+
+  <aside id="onboarding-panel" class="onboarding-panel" aria-label="Getting started" aria-hidden="true">
+    <button id="close-onboarding-btn" class="onboarding-close" aria-label="Close guide">×</button>
+    <span class="eyebrow light">Your first project</span><h2>Four steps to a useful answer</h2>
+    <p>Studio can stay simple. Follow this path, then reveal specialist tools only when you need them.</p>
+    <div id="onboarding-steps" class="onboarding-steps"></div>
+    <button id="finish-onboarding-btn" class="button white">Got it</button>
+  </aside>
+  <div id="onboarding-scrim" class="onboarding-scrim" hidden></div>
+
+  <nav id="studio-action-dock" class="studio-action-dock" aria-label="Quick workspace actions">
+    <button class="mobile-nav-action" data-mobile-view="data"><span>▦</span>Data</button>
+    <button class="mobile-nav-action" data-mobile-view="analyst"><span>V</span>Analyze</button>
+    <button class="mobile-nav-action" data-mobile-view="report"><span>▤</span>Report</button>
+    <button class="mobile-nav-action" id="mobile-chat-btn"><span>◎</span>Chat</button>
+    <button id="save-analysis-view-btn"><span>＋</span>Save view</button>
+    <button id="open-saved-views-btn"><span>◫</span>Views <b id="saved-view-count">0</b></button>
+    <button id="start-presentation-btn"><span>▶</span>Present</button>
+  </nav>
+
+  <div id="import-preview" class="import-preview" hidden><div class="import-preview-card" role="dialog" aria-modal="true" aria-labelledby="import-preview-title"><header><div><span class="eyebrow">Import review</span><h2 id="import-preview-title">Check the data before adding it</h2></div><button id="close-import-preview" aria-label="Close">×</button></header><div id="import-preview-body"></div><footer><button id="cancel-import-btn" class="button ghost">Cancel</button><button id="confirm-import-btn" class="button primary">Add selected data</button></footer></div></div>
+
+  <div id="presentation-mode" class="presentation-mode" hidden><header><span id="presentation-progress">1 / 1</span><div class="presentation-controls"><button id="presentation-notes-btn">Notes</button><button id="presentation-fullscreen-btn">Fullscreen</button><button id="close-presentation-btn">×</button></div></header><main id="presentation-slide"></main><aside id="presentation-notes" hidden></aside><footer><button id="presentation-prev-btn">←</button><div id="presentation-dots"></div><button id="presentation-next-btn">→</button></footer></div>
+
+  <aside id="chat-drawer" class="chat-drawer" aria-label="Project chat" aria-hidden="true">
+    <header class="chat-header"><div><span class="eyebrow light">Team collaboration</span><h2>Project chat</h2></div><button id="close-chat-btn" aria-label="Close chat">×</button></header>
+    <div class="chat-presence"><div id="chat-presence-list" class="presence-list"></div><span id="chat-connection-label">Local project room</span><button id="chat-settings-btn">Connect live</button></div>
+    <section id="chat-settings" class="chat-settings" hidden>
+      <div class="chat-settings-head"><strong>Live team room</strong><button id="chat-settings-close">Done</button></div>
+      <p>Connect the same Supabase project and room on each device. Messages use Realtime Broadcast and remain saved locally in each participant’s DataHub project.</p>
+      <details class="chat-setup-guide"><summary>Show the 3-step setup</summary><ol><li>Create or open a Supabase project.</li><li>In Project Settings → API, copy the Project URL and publishable/anon key.</li><li>Every teammate enters those values and the exact same room name here.</li></ol></details>
+      <input id="chat-display-name" placeholder="Your display name">
+      <input id="chat-supabase-url" type="url" placeholder="Supabase project URL">
+      <input id="chat-supabase-key" type="password" placeholder="Supabase anon/publishable key">
+      <input id="chat-room-name" placeholder="Team room name">
+      <div class="chat-setting-actions"><button id="connect-chat-btn" class="button primary">Connect room</button><button id="disconnect-chat-btn" class="button ghost">Use local mode</button></div>
+      <div class="chat-privacy-note"><strong>Room access:</strong> anyone with the project URL, publishable key, and exact room name can join. Do not post confidential data until your Supabase project has appropriate access controls.</div>
+    </section>
+    <nav id="chat-channels" class="chat-channels" aria-label="Chat channels"></nav>
+    <div class="chat-tools"><input id="chat-search" placeholder="Search messages"><button id="chat-invite-btn" title="Copy room details">Invite</button></div>
+    <div id="chat-messages" class="chat-messages" aria-live="polite"></div>
+    <div id="chat-typing" class="chat-typing"></div>
+    <div id="chat-reply-preview" class="chat-reply-preview" hidden></div>
+    <form id="chat-form" class="chat-composer">
+      <textarea id="chat-message" rows="2" placeholder="Message the project team…"></textarea>
+      <div class="chat-compose-row"><select id="chat-reference" aria-label="Attach project reference"><option value="">Attach project context…</option></select><button type="submit" class="button primary">Send</button></div>
+    </form>
+  </aside>
+  <div id="chat-scrim" class="chat-scrim" hidden></div>
+
   <script src="../shared/parse.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="studio.js"></script>
   <script src="intelligence.js"></script>
   <script src="analyst.js"></script>
+  <script src="collaboration.js"></script>
+  <script src="operations.js"></script>
+  <script src="experience.js"></script>
+  <script src="evidence.js"></script>
   <script src="../shared/platform.js"></script>
 </body>
 </html>

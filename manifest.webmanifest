@@ -5,8 +5,8 @@
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f8fafc",
-  "theme_color": "#00133c",
+  "background_color": "#07050b",
+  "theme_color": "#ff2bd6",
   "shortcuts": [
     {
       "name": "Open DataHub Studio",

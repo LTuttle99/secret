@@ -146,6 +146,23 @@ library's output through `tools/shared/sanitize.js` before rendering.
   presentation coaching, a safe SQL subset, Python/R/SQL exports, synthetic
   data, final quality gates, guided learning, completion scoring, and portal
   branding. Analyst Lab changes retain local undo snapshots for review.
+- **Project chat** — a responsive team drawer provides General, Analysis, Data
+  Quality, and Decisions channels; replies, mentions, pinned decisions, search,
+  dataset/metric/definition/story references, unread counts, typing indicators,
+  and active-user presence. Local chat persists in each Studio project and
+  syncs across same-origin tabs. Teams can optionally enter a Supabase project
+  URL, publishable key, and shared room name for live cross-device Realtime
+  Broadcast; the key stays in that browser and is excluded from project bundles.
+- **Analytics Operations Hub** — chat messages become assignments, data issues,
+  and governed decisions; teams can annotate evidence, arrange a live shared
+  canvas, monitor thresholds, collect analysis requests and form responses,
+  prepare scheduled exports, assign project roles, create encrypted read-only
+  shares, branch analyses, inspect the audit trail and lineage graph, certify
+  metric ownership, maintain an organization knowledge base, review portfolio
+  health, run five specialist review agents, capture meeting minutes, dictate
+  work by voice, publish an internal analytics portal, and install guided
+  connector packs. External email and messaging-platform notifications are not
+  included; alerts remain in DataHub or the optional Live Room.
 - **Guided data-source setup** — Vanessa asks where the data lives and gives a
   step-by-step preparation, permission, privacy, and connection walkthrough for
   local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,
