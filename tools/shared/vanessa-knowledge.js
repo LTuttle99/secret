@@ -99,7 +99,7 @@ const VANESSA_SHARED_TOPICS = [
 
 const VANESSA_KNOWLEDGE = {
   "hub": {
-    title: "Data and Analytics Hub",
+    title: "Signal Noir",
     summary: "The landing page for the team's browser-based data tools. Every tool runs locally, needs no login, and is reached from a card on this page.",
     topics: [
       { keywords: ["which tool", "what tool", "recommend", "suggest", "should i use", "where do i", "how do i start", "best tool"], text: "Tell me what you are trying to do and I will point you at a tool. The short version: exploring or summarising a file starts with Column Statistics or Instant Dashboard, cleaning starts with Data Cleaner or Fuzzy Duplicate Finder, combining files starts with Lookup and Merge or SQL Workbench, and presenting results starts with Chart Builder or Dashboard Builder." },

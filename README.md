@@ -1,4 +1,4 @@
-# Data and Analytics Hub
+# Signal Noir
 
 A static, backend-free home page for the team's data tools. `index.html` at
 the repo root is the hub landing page; each tool lives in its own folder
@@ -9,7 +9,7 @@ and a card on the landing page, and it's a new tool.
 
 | Tool | Folder | What it does |
 |---|---|---|
-| DataHub Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, data intelligence, privacy controls, governance, reports, custom tools, connections, collaboration bundles, and schedules |
+| Signal Noir Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, data intelligence, privacy controls, governance, reports, custom tools, connections, collaboration bundles, and schedules |
 | Data Analyzer | `tools/data-analyzer/` | KPIs, forecasting, goal pacing, anomaly detection, AI insights on CSV, TSV, delimited text, JSON and Excel data |
 | File Diff | `tools/file-diff/` | Compares two files by a key column — added / removed / changed rows |
 | Pivot & Chart Explorer | `tools/pivot-explorer/` | Ad-hoc pivot table + chart on any file, no fixed schema |
@@ -128,7 +128,7 @@ library's output through `tools/shared/sanitize.js` before rendering.
   hub to be installed and cache visited pages for more resilient repeat use.
 - **Progressive controls** — sections explicitly labeled as advanced, options,
   settings, or configuration begin collapsed and can be revealed when needed.
-- **DataHub Studio** — named projects persist in IndexedDB and bring together
+- **Signal Noir Studio** — named projects persist in IndexedDB and bring together
   multiple datasets, inferred relationships, reusable workflow steps, lineage,
   dictionaries, quality rules, reports, presentation mode, PowerPoint/HTML
   export, custom tools, public HTTP/Google Sheets connections, portable team
@@ -162,7 +162,7 @@ library's output through `tools/shared/sanitize.js` before rendering.
   health, run five specialist review agents, capture meeting minutes, dictate
   work by voice, publish an internal analytics portal, and install guided
   connector packs. External email and messaging-platform notifications are not
-  included; alerts remain in DataHub or the optional Live Room.
+  included; alerts remain in Signal Noir or the optional Live Room.
 - **Guided data-source setup** — Vanessa asks where the data lives and gives a
   step-by-step preparation, permission, privacy, and connection walkthrough for
   local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,
@@ -1216,7 +1216,7 @@ uses public HTTP data sources, and exports portable bundles and calendar events.
 ## Renaming the hub
 
 The landing page title, header text, and tagline are plain text/HTML at the
-top of the root `index.html` — edit `Data and Analytics Hub` and the intro
+top of the root `index.html` — edit `Signal Noir` and the intro
 paragraph to your team's actual name. No build step, just save and push.
 
 ## Adding another tool

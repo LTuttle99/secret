@@ -1,4 +1,4 @@
-# How the Data and Analytics Hub keeps your data safe
+# How the Signal Noir keeps your data safe
 
 Last reviewed 17 September 2026.
 
@@ -27,7 +27,7 @@ service hands out HTML, CSS and JavaScript and does nothing else.
   deployed and there is no endpoint that could receive a file. Static Web Apps can host Azure
   Functions, so if an `api/` folder is ever added and the workflow's `api_location` pointed at
   it, this section stops being true and needs rewriting.
-- **No server database.** DataHub Studio uses browser-local IndexedDB for projects and the
+- **No server database.** Signal Noir Studio uses browser-local IndexedDB for projects and the
   shared workspace. That storage stays inside the current browser profile.
 - **No accounts.** There is no sign-in, no session, no user record, so there is no store of
   credentials to leak.
@@ -160,8 +160,8 @@ removed by clearing site data for the site.
 | `hub_tool_view` | Hub landing page | Card or compact layout preference |
 | `hub_show_definitions` | Explanations toggle | Whether explanations are on |
 | `hub_theme` | Light and Dark toggle | Your theme choice |
-| `datahub_studio_active` | DataHub Studio | The identifier of the last open project |
-| `datahub_studio_local_ai` | DataHub Studio | Whether browser-local AI should be used when available |
+| `datahub_studio_active` | Signal Noir Studio | The identifier of the last open project |
+| `datahub_studio_local_ai` | Signal Noir Studio | Whether browser-local AI should be used when available |
 | `vanessa_memory` | Vanessa, opt-in and off by default | Lines you explicitly asked her to remember |
 | `vanessa_in_browser_model` | Vanessa, opt-in and off by default | Whether to use the in-browser model |
 
@@ -178,7 +178,7 @@ open every tool. Real per-person restriction would require server-backed authent
 
 **IndexedDB storage:** `datahub_workspace` stores the one shared workspace file; `datahub_studio`
 stores named Studio projects, which can include raw rows, workflows, quality rules, comments,
-reports, and project history. Clear them from browser settings or from the relevant DataHub
+reports, and project history. Clear them from browser settings or from the relevant Signal Noir
 controls. They do not synchronize unless you explicitly export and transfer a project bundle.
 
 ## Where the guarantee actually rests

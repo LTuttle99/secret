@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#07050b">
-  <title>DataHub Studio</title>
+  <title>Signal Noir Studio</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
@@ -32,9 +32,9 @@
   <header class="studio-topbar">
     <div class="brand-row">
       <a href="../../index.html" class="back-link">← Hub</a>
-      <div class="brand-mark">S</div>
+      <div class="brand-mark">SN</div>
       <div>
-        <h1>DataHub Studio</h1>
+        <h1>Signal Noir Studio</h1>
         <p>Projects, workflows, reports, and automation</p>
       </div>
     </div>
@@ -180,7 +180,7 @@
             <article class="surface"><span class="eyebrow">Deliverable quality gate</span><h3>Check before you publish</h3><button id="run-deliverable-check-btn" class="button primary">Run final review</button><div id="deliverable-checks" class="completion-list"></div></article>
             <article class="surface"><span class="eyebrow">Guided learning mode</span><h3>Teach the reason behind each step</h3><div class="setting-row"><div><strong>Learning explanations</strong><span>Show what the step does, why it matters, and common mistakes.</span></div><label class="switch"><input id="learning-mode-toggle" type="checkbox"><span></span></label></div><div id="learning-card" class="learning-card"></div></article>
           </div>
-          <article class="surface"><span class="eyebrow">Branded organization portal</span><h3>Make DataHub feel like your team</h3><div class="branding-grid"><input id="brand-name" placeholder="Organization or department"><input id="brand-primary" type="color" value="#00133c" aria-label="Primary brand color"><input id="brand-accent" type="color" value="#0062f1" aria-label="Accent brand color"><input id="brand-analyst-name" placeholder="Assistant name" value="Vanessa"><select id="brand-language"><option value="Dataset">Call data “Dataset”</option><option value="Workbook">Call data “Workbook”</option><option value="Evidence set">Call data “Evidence set”</option></select><button id="apply-brand-btn" class="button primary">Apply portal brand</button></div><div id="brand-preview" class="brand-preview"><span id="brand-preview-mark">D</span><div><strong id="brand-preview-name">DataHub</strong><small id="brand-preview-tagline">Trusted analytics workspace</small></div></div></article>
+          <article class="surface"><span class="eyebrow">Branded organization portal</span><h3>Make Signal Noir feel like your team</h3><div class="branding-grid"><input id="brand-name" placeholder="Organization or department"><input id="brand-primary" type="color" value="#00133c" aria-label="Primary brand color"><input id="brand-accent" type="color" value="#0062f1" aria-label="Accent brand color"><input id="brand-analyst-name" placeholder="Assistant name" value="Vanessa"><select id="brand-language"><option value="Dataset">Call data “Dataset”</option><option value="Workbook">Call data “Workbook”</option><option value="Evidence set">Call data “Evidence set”</option></select><button id="apply-brand-btn" class="button primary">Apply portal brand</button></div><div id="brand-preview" class="brand-preview"><span id="brand-preview-mark">S</span><div><strong id="brand-preview-name">Signal Noir</strong><small id="brand-preview-tagline">Trusted analytics workspace</small></div></div></article>
         </div>
       </section>
 
@@ -408,7 +408,7 @@
     <div class="chat-presence"><div id="chat-presence-list" class="presence-list"></div><span id="chat-connection-label">Local project room</span><button id="chat-settings-btn">Connect live</button></div>
     <section id="chat-settings" class="chat-settings" hidden>
       <div class="chat-settings-head"><strong>Live team room</strong><button id="chat-settings-close">Done</button></div>
-      <p>Connect the same Supabase project and room on each device. Messages use Realtime Broadcast and remain saved locally in each participant’s DataHub project.</p>
+      <p>Connect the same Supabase project and room on each device. Messages use Realtime Broadcast and remain saved locally in each participant’s Signal Noir project.</p>
       <details class="chat-setup-guide"><summary>Show the 3-step setup</summary><ol><li>Create or open a Supabase project.</li><li>In Project Settings → API, copy the Project URL and publishable/anon key.</li><li>Every teammate enters those values and the exact same room name here.</li></ol></details>
       <input id="chat-display-name" placeholder="Your display name">
       <input id="chat-supabase-url" type="url" placeholder="Supabase project URL">

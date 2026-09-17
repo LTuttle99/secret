@@ -10,7 +10,7 @@
   const currentKey = "current";
 
   const tools = [
-    ["studio", "DataHub Studio", "Projects, workflows, quality monitoring, reports, and automation"],
+    ["studio", "Signal Noir Studio", "Projects, workflows, quality monitoring, reports, and automation"],
     ["data-analyzer", "Data Analyzer", "KPIs, forecasting, anomalies and insights"],
     ["instant-dashboard", "Instant Dashboard", "Build a dashboard automatically from a file"],
     ["dashboard-builder", "Dashboard Builder", "Design and share a custom dashboard"],
@@ -135,7 +135,7 @@
       "2026-05-01,North,Pro,18440,168,4.6",
       "2026-06-01,South,Enterprise,23950,186,4.8"
     ].join("\n");
-    return new File([csv], "datahub-sample.csv", { type: "text/csv" });
+    return new File([csv], "signal-noir-sample.csv", { type: "text/csv" });
   }
 
   async function useSample() {
@@ -248,7 +248,7 @@
   function platformBar() {
     const bar = document.createElement("nav");
     bar.className = "dh-platform-bar";
-    bar.setAttribute("aria-label", "DataHub quick controls");
+    bar.setAttribute("aria-label", "Signal Noir quick controls");
     bar.innerHTML = `<button class="dh-platform-button" data-dh-command title="Open command center"><strong>⌘</strong><span>Command</span></button><button class="dh-platform-button" data-dh-workspace title="Workspace"><strong>▣</strong><span>Workspace</span></button><button class="dh-platform-button" data-dh-export title="Export center"><strong>⇩</strong><span>Export</span></button><button class="dh-platform-button" data-dh-theme title="Toggle theme"><strong>◐</strong><span>Theme</span></button>`;
     document.body.appendChild(bar);
     bar.querySelector("[data-dh-command]").addEventListener("click", openCommandCenter);
@@ -281,7 +281,7 @@
     const actions = [
       { title: "Ask Vanessa", description: "Describe a goal and get a workflow", icon: "V", run: () => { location.href = new URL("index.html#vanessa-finder", rootUrl).href; } },
       { title: "Load sample data", description: "Try tools without finding a file", icon: "+", run: useSample },
-      { title: "Toggle dark mode", description: "Switch the DataHub theme", icon: "◐", run: () => document.querySelector("[data-dh-theme]")?.click() },
+      { title: "Toggle dark mode", description: "Switch the Signal Noir theme", icon: "◐", run: () => document.querySelector("[data-dh-theme]")?.click() },
       { title: "Print or save as PDF", description: "Export the current view", icon: "P", run: () => window.print() }
     ];
     const items = tools.map(tool => ({ title: tool.title, description: tool.description, icon: tool.title.slice(0, 1), run: () => { location.href = tool.url; } })).concat(actions);

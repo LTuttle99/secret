@@ -1,6 +1,6 @@
 {
-  "name": "Data and Analytics Hub",
-  "short_name": "DataHub",
+  "name": "Signal Noir",
+  "short_name": "Signal Noir",
   "description": "Private, browser-based tools for analysis, cleaning, dashboards, statistics, and developer workflows.",
   "start_url": "./index.html",
   "scope": "./",
@@ -9,7 +9,7 @@
   "theme_color": "#ff2bd6",
   "shortcuts": [
     {
-      "name": "Open DataHub Studio",
+      "name": "Open Signal Noir Studio",
       "short_name": "Studio",
       "url": "./tools/studio/index.html"
     },
@@ -21,7 +21,7 @@
   ],
   "icons": [
     {
-      "src": "datahub-icon.svg",
+      "src": "signal-noir-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",
       "purpose": "any maskable"

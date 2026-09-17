@@ -168,7 +168,7 @@
     const p=project(),ds=studio.activeDataset(),r=p.report;
     if(!r&&ds)$("#generate-report-btn")?.click();
     const report=p.report;
-    const slides=[{kicker:"DataHub Studio",title:p.name,text:p.goal||"A clear path from source data to a defensible decision.",notes:"Open with the decision this work supports and who needs to act."}];
+    const slides=[{kicker:"Signal Noir Studio",title:p.name,text:p.goal||"A clear path from source data to a defensible decision.",notes:"Open with the decision this work supports and who needs to act."}];
     if(ds)slides.push({kicker:"Evidence base",title:format(ds.rows.length)+" records. "+ds.columns.length+" fields.",text:"Source: "+ds.name+". The analysis remains linked to the underlying rows.",kpis:[[""+format(ds.rows.length),"Rows"],[""+ds.columns.length,"Fields"],[""+(report?.quality?.score??"—"),"Quality"]],notes:"Explain the source, period covered, and any limits before presenting results."});
     if(report?.summary?.numeric?.[0]){const m=report.summary.numeric[0];slides.push({kicker:"Leading measure",title:format(m.total),text:m.column+" totals "+format(m.total)+" with an average of "+format(m.average)+".",kpis:[[format(m.min),"Minimum"],[format(m.average),"Average"],[format(m.max),"Maximum"]],notes:"Connect this measure to the decision. Avoid implying causation unless the analysis supports it."});}
     if(report?.summary?.breakdown?.length){const top=report.summary.breakdown[0];slides.push({kicker:"Largest segment",title:String(top[0]),text:format(top[1])+" records make this the largest "+report.summary.category+" segment.",notes:"Call out whether this mix is expected and what it changes operationally."});}

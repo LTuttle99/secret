@@ -29,10 +29,10 @@
   ];
 
   const sourceGuides = {
-    files: { title: "Excel, CSV, or JSON file", short: "Files on your computer", privacy: "Private: the browser reads the file locally. It is not uploaded to DataHub.", action: "Choose files", actionType: "files", steps: [
+    files: { title: "Excel, CSV, or JSON file", short: "Files on your computer", privacy: "Private: the browser reads the file locally. It is not uploaded to Signal Noir.", action: "Choose files", actionType: "files", steps: [
       ["Prepare the file", "Put field names in one header row. Avoid merged cells, password protection, and decorative titles above the table when possible."],
       ["Choose the file", "Use the file picker or drag several files into the Data catalog. CSV, Excel, JSON, TSV, and text files are supported."],
-      ["Confirm the sheet", "If an Excel workbook contains multiple sheets, DataHub asks you to choose one or combine them. Review the detected columns before analysis."],
+      ["Confirm the sheet", "If an Excel workbook contains multiple sheets, Signal Noir asks you to choose one or combine them. Review the detected columns before analysis."],
       ["Save the project", "The parsed rows remain in this browser’s project storage so the workflow can be reopened and rerun later."]
     ]},
     folder: { title: "Folder or ZIP archive", short: "Many files at once", privacy: "Private: compatible files are unpacked and parsed inside the browser.", action: "Choose a folder", actionType: "folder", steps: [
@@ -47,7 +47,7 @@
       ["Paste it into Studio", "Choose Public Google Sheet in the connection box, paste the link, and select Connect."],
       ["Refresh behavior", "Studio saves the public export URL and refreshes its local snapshot whenever the project opens."]
     ]},
-    url: { title: "CSV or JSON web address", short: "A public API or download URL", privacy: "Studio makes a direct browser request to the address. The source server will see the browser request, but DataHub does not relay it.", action: "Open connection box", actionType: "url", steps: [
+    url: { title: "CSV or JSON web address", short: "A public API or download URL", privacy: "Studio makes a direct browser request to the address. The source server will see the browser request, but Signal Noir does not relay it.", action: "Open connection box", actionType: "url", steps: [
       ["Find a direct data URL", "Use an address that returns CSV text, a JSON array, or an object containing records—not a webpage that happens to show data."],
       ["Check browser access", "The server must allow cross-origin browser requests (CORS). Opening the URL in a new tab should show or download the raw data."],
       ["Connect it", "Choose CSV or JSON URL, paste the complete https:// address, and select Connect."],
@@ -59,7 +59,7 @@
       ["Add authentication and CORS", "Require your organization’s login or a short-lived token, restrict allowed origins, rate-limit requests, and log access without logging returned data."],
       ["Connect the gateway URL", "Once the endpoint exists, use CSV or JSON URL in Studio. A GitHub Pages site cannot safely connect directly to database ports."]
     ]},
-    airtable: { title: "Airtable", short: "Base, table, or view", privacy: "Do not paste an Airtable personal access token into DataHub. Use a published view or a protected gateway.", action: "Copy Airtable checklist", actionType: "airtable", steps: [
+    airtable: { title: "Airtable", short: "Base, table, or view", privacy: "Do not paste an Airtable personal access token into Signal Noir. Use a published view or a protected gateway.", action: "Copy Airtable checklist", actionType: "airtable", steps: [
       ["Choose the access method", "For non-sensitive data, create a read-only shared view. For private data, use an authenticated server-side gateway."],
       ["Limit the fields", "Expose only the table, view, and fields needed for analysis. Remove attachments or personal fields that are unnecessary."],
       ["Return CSV or JSON", "Have the shared-view download or gateway return a consistent table. Stable field names make repeatable workflows reliable."],
@@ -410,7 +410,7 @@
   async function downloadPowerPoint() {
     if (!state.project.report) generateReport();
     if (typeof PptxGenJS === "undefined") return toast("PowerPoint export did not load. Check your connection and try again.");
-    const report = state.project.report; const pptx = new PptxGenJS(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "DataHub Studio"; pptx.subject = state.project.name; pptx.title = report.title;
+    const report = state.project.report; const pptx = new PptxGenJS(); pptx.layout = "LAYOUT_WIDE"; pptx.author = "Signal Noir Studio"; pptx.subject = state.project.name; pptx.title = report.title;
     let slide = pptx.addSlide(); slide.background = { color: "00133C" }; slide.addText(report.title, { x: .7, y: 1.5, w: 11.7, h: 1.2, fontFace: "Georgia", fontSize: 30, bold: true, color: "FFFFFF", breakLine: false }); slide.addText(`Source: ${report.dataset}\nGenerated ${new Date(report.generatedAt).toLocaleString()}`, { x: .72, y: 2.9, w: 8, h: .7, fontFace: "Arial", fontSize: 12, color: "AFC8EE" });
     slide = pptx.addSlide(); slide.addText("Executive summary", { x: .6, y: .45, w: 12, h: .5, fontFace: "Georgia", fontSize: 24, bold: true, color: "00133C" }); const kpis = [[report.rows.toLocaleString(), "Rows analyzed"], [String(report.columns), "Columns profiled"], [String(report.quality.score), "Quality score"]]; kpis.forEach((item, index) => { const x = .7 + index * 4.15; slide.addText(item[0], { x, y: 1.35, w: 3.7, h: 1.05, fontFace: "Georgia", fontSize: 25, bold: true, color: "00133C", align: "center", valign: "mid", fill: { color: "F1F5F9" }, line: { color: "E2E8F0" }, radius: .08 }); slide.addText(item[1], { x: x + .25, y: 2.5, w: 3.2, h: .25, fontFace: "Arial", fontSize: 10, color: "64748B", align: "center" }); });
     const lead = report.summary.numeric[0]; const narrative = lead ? `The leading measurable field is ${lead.column}, totaling ${formatNumber(lead.total)} with an average of ${formatNumber(lead.average)}. The configured quality score is ${report.quality.score}.` : `The dataset contains ${report.rows.toLocaleString()} records and is primarily categorical or descriptive. The configured quality score is ${report.quality.score}.`; slide.addText(narrative, { x: .8, y: 3.35, w: 11.6, h: 1.2, fontFace: "Arial", fontSize: 17, color: "334155", breakLine: false, margin: .08 });
@@ -507,14 +507,14 @@
 
   function shareDialog() {
     dialog(`<span class="eyebrow">Collaboration bundle</span><h2>What should be included?</h2><p class="muted">A portable JSON bundle can move this project to another browser. Data is optional.</p><div class="stack" style="margin-top:18px"><button class="button primary" data-bundle-data>Include project data</button><button class="button ghost" data-bundle-structure>Structure only</button></div>`);
-    $("[data-bundle-data]").onclick = () => { download(`${slug(state.project.name)}.datahub.json`, JSON.stringify(projectBundle(true), null, 2)); closeDialog(); };
-    $("[data-bundle-structure]").onclick = () => { download(`${slug(state.project.name)}-structure.datahub.json`, JSON.stringify(projectBundle(false), null, 2)); closeDialog(); };
+    $("[data-bundle-data]").onclick = () => { download(`${slug(state.project.name)}.signalnoir.json`, JSON.stringify(projectBundle(true), null, 2)); closeDialog(); };
+    $("[data-bundle-structure]").onclick = () => { download(`${slug(state.project.name)}-structure.signalnoir.json`, JSON.stringify(projectBundle(false), null, 2)); closeDialog(); };
   }
 
   function exportIcs() {
     if (!state.project.schedules.length) return toast("Add a schedule first.");
-    const events = state.project.schedules.map(item => { const date = item.date.replaceAll("-", ""); return `BEGIN:VEVENT\nUID:${item.id}@datahub\nDTSTART;VALUE=DATE:${date}\nSUMMARY:${item.name}\nDESCRIPTION:Open DataHub Studio and run ${state.project.name}.\nEND:VEVENT`; }).join("\n");
-    download(`${slug(state.project.name)}-schedule.ics`, `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//DataHub//Studio//EN\n${events}\nEND:VCALENDAR`, "text/calendar");
+    const events = state.project.schedules.map(item => { const date = item.date.replaceAll("-", ""); return `BEGIN:VEVENT\nUID:${item.id}@signal-noir\nDTSTART;VALUE=DATE:${date}\nSUMMARY:${item.name}\nDESCRIPTION:Open Signal Noir Studio and run ${state.project.name}.\nEND:VEVENT`; }).join("\n");
+    download(`${slug(state.project.name)}-schedule.ics`, `BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//Signal Noir//Studio//EN\n${events}\nEND:VCALENDAR`, "text/calendar");
   }
 
   function advanceSchedule(item) {

@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Data and Analytics Hub</title>
+    <title>Signal Noir</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307050B'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23FF2BD6' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="signal-noir-icon.svg" type="image/svg+xml">
     <style>
         .font-serif-brand { font-family: 'Lora', ui-serif, Georgia, serif; }
         html { scroll-behavior: smooth; }
@@ -150,9 +150,9 @@
 
     <header id="hub-header" class="border-b border-slate-200/80 px-5 sm:px-8 py-4 flex flex-wrap items-center justify-between gap-3">
         <div class="flex items-center space-x-3">
-            <div class="h-9 w-9 rounded bg-[#00133C] flex items-center justify-center font-bold text-white" aria-hidden="true">H</div>
+            <div class="h-9 w-9 rounded bg-[#07050B] flex items-center justify-center text-[11px] tracking-[-.08em] font-bold text-[#FF2BD6] shadow-[0_0_18px_rgba(255,43,214,.42)]" aria-hidden="true">SN</div>
             <h1 class="text-xl font-semibold tracking-wide text-[#00133C]">
-                Data<span class="text-[#0062F1] font-normal">Hub</span>
+                Signal <span class="text-[#FF2BD6] font-normal">Noir</span>
             </h1>
         </div>
 
@@ -162,7 +162,7 @@
                     <span class="ping-dot animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="solid-dot relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                 </span>
-                <span id="hub-status-text">Data Hub Online</span>
+                <span id="hub-status-text">Signal Noir Online</span>
             </div>
             <a href="dashboards.html" class="text-xs font-semibold text-white bg-[#0062F1] hover:bg-[#00133C] px-3 py-1.5 rounded-full transition-colors">
                 Dashboards
@@ -183,7 +183,7 @@
                 Built for the team
             </span>
             <h2 class="font-serif-brand text-4xl sm:text-6xl leading-[1.08] tracking-tight text-[#00133C] mb-5">
-                Welcome to the Data and <span class="text-[#DC6803]">Analytics</span> Hub
+                Find the signal. <span class="text-[#FF2BD6]">Cut through the noise.</span>
             </h2>
             <p class="text-base sm:text-lg text-slate-600 leading-relaxed max-w-2xl">
                 Please select a tool to get started. Everything here runs entirely in your browser, so
@@ -273,7 +273,7 @@
 
                 <a href="tools/studio/index.html" data-tool="studio" class="tool-card group bg-[#00133C] border border-[#00133C] hover:border-[#0062F1] hover:shadow-xl rounded-xl p-6 shadow-md transition-all flex flex-col text-white">
                     <div class="h-10 w-10 rounded-lg bg-[#0062F1] text-white flex items-center justify-center text-lg font-bold mb-4" aria-hidden="true">S</div>
-                    <h4 class="text-base font-semibold text-white mb-1.5">DataHub Studio</h4>
+                    <h4 class="text-base font-semibold text-white mb-1.5">Signal Noir Studio</h4>
                     <p class="text-sm text-slate-300 leading-relaxed flex-1">
                         Work with Vanessa and your team from raw files to accountable action—analyze,
                         collaborate, govern, assign, approve, and publish the result.
@@ -831,7 +831,7 @@
                 badge.className = 'flex items-center gap-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200';
                 pingDot.className = 'ping-dot animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75';
                 solidDot.className = 'solid-dot relative inline-flex rounded-full h-2 w-2 bg-emerald-500';
-                text.innerText = 'Data Hub Online';
+                text.innerText = 'Signal Noir Online';
             } else {
                 badge.className = 'flex items-center gap-1.5 text-xs font-medium text-red-700 bg-red-50 px-3 py-1.5 rounded-full border border-red-200';
                 pingDot.className = 'ping-dot animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75';

@@ -108,7 +108,7 @@
   }
   async function disconnectLive(clearConfig = true) { if (state.client && state.realtime) { try { await state.client.removeChannel(state.realtime); } catch (_) {} } state.client = null; state.realtime = null; state.live = false; state.connectedProjectId = null; state.livePresence = []; if (clearConfig && project()) { project().collaborationConfig = null; studio.markDirty(); persistSoon(); } setConnectionLabel(); renderPresence(); if (clearConfig) studio.toast("Using local project chat."); }
   function copyInvite() {
-    const config = roomConfig(), text = state.live && config ? `Join my DataHub project chat.\nRoom: ${config.room}\nSupabase project: ${config.url}\nAsk me separately for the publishable key, then open Studio → Chat → Connect live.` : `Open this DataHub project and choose Chat. We are currently using local mode, which syncs only between browser tabs.`;
+    const config = roomConfig(), text = state.live && config ? `Join my Signal Noir project chat.\nRoom: ${config.room}\nSupabase project: ${config.url}\nAsk me separately for the publishable key, then open Studio → Chat → Connect live.` : `Open this Signal Noir project and choose Chat. We are currently using local mode, which syncs only between browser tabs.`;
     navigator.clipboard?.writeText(text).then(() => studio.toast("Chat invitation details copied.")).catch(() => studio.toast("Could not copy the invitation."));
   }
 

@@ -12,7 +12,7 @@ body{background:
   #09070e;color:var(--ink)}
 body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 85%)}
 .studio-topbar{border-color:rgba(255,255,255,.08);background:rgba(7,5,11,.82);box-shadow:0 8px 36px rgba(0,0,0,.32)}
-.brand-mark{background:linear-gradient(145deg,#ff2bd6,#7b36ff);box-shadow:0 0 24px rgba(255,43,214,.38);color:#fff}
+.brand-mark{background:linear-gradient(145deg,#ff2bd6,#7b36ff);box-shadow:0 0 24px rgba(255,43,214,.38);color:#fff;font-size:12px;letter-spacing:-.06em}
 .brand-row h1,.view-heading h2,.surface h3,.metric-card strong,.dataset-card h3,.report-title,.report-section h3,.next-step-card strong{color:#fff}
 .back-link,.brand-row p,.view-heading p,.muted,.fine-print{color:var(--muted)}
 .studio-shell{grid-template-columns:224px minmax(0,1fr)}
