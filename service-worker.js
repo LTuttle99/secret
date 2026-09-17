@@ -1,4 +1,4 @@
-const CACHE = "datahub-platform-v3";
+const CACHE = "datahub-platform-v5";
 const CORE = [
   "./",
   "./index.html",
@@ -6,7 +6,11 @@ const CORE = [
   "./datahub-icon.svg",
   "./tools/shared/platform.css",
   "./tools/shared/platform.js",
-  "./tools/shared/theme.js"
+  "./tools/shared/theme.js",
+  "./tools/studio/index.html",
+  "./tools/studio/studio.css",
+  "./tools/studio/source-guide.css",
+  "./tools/studio/studio.js"
 ];
 
 self.addEventListener("install", event => {

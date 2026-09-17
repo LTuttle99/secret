@@ -10,6 +10,7 @@
   const currentKey = "current";
 
   const tools = [
+    ["studio", "DataHub Studio", "Projects, workflows, quality monitoring, reports, and automation"],
     ["data-analyzer", "Data Analyzer", "KPIs, forecasting, anomalies and insights"],
     ["instant-dashboard", "Instant Dashboard", "Build a dashboard automatically from a file"],
     ["dashboard-builder", "Dashboard Builder", "Design and share a custom dashboard"],

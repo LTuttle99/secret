@@ -7,6 +7,18 @@
   "display": "standalone",
   "background_color": "#f8fafc",
   "theme_color": "#00133c",
+  "shortcuts": [
+    {
+      "name": "Open DataHub Studio",
+      "short_name": "Studio",
+      "url": "./tools/studio/index.html"
+    },
+    {
+      "name": "Instant Dashboard",
+      "short_name": "Dashboard",
+      "url": "./tools/instant-dashboard/index.html"
+    }
+  ],
   "icons": [
     {
       "src": "datahub-icon.svg",

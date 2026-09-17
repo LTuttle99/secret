@@ -1,6 +1,6 @@
 # How the Data and Analytics Hub keeps your data safe
 
-Last reviewed 10 August 2026.
+Last reviewed 17 September 2026.
 
 This document exists so that "your files never leave your computer" is a claim you can check
 rather than one you have to take on trust. It states what the site does, what it sends, what
@@ -11,7 +11,7 @@ honest part.
 ## The short version
 
 There is no server to send your data to. The hub is a set of static HTML and JavaScript files.
-When you open a file in any of the 26 tools, the browser reads it off your own disk, parses it
+When you open a file in any of the 27 tools, the browser reads it off your own disk, parses it
 in the tab, and does the analysis there. Nothing is uploaded, because there is nothing to
 upload it to.
 
@@ -20,15 +20,15 @@ a consequence of the architecture: no backend, no database, no accounts, no logg
 
 ## Why there is nothing to breach
 
-The site is hosted on Azure Static Web Apps and deployed from a GitHub repository by a
-workflow. A deploy is a file copy. The service hands out HTML, CSS and JavaScript and does
-nothing else.
+The site is hosted as static files from a GitHub repository. A deploy is a file copy. The
+service hands out HTML, CSS and JavaScript and does nothing else.
 
 - **No backend.** There is no `api/` folder in the repository, so no server-side function is
   deployed and there is no endpoint that could receive a file. Static Web Apps can host Azure
   Functions, so if an `api/` folder is ever added and the workflow's `api_location` pointed at
   it, this section stops being true and needs rewriting.
-- **No database.** Static Web Apps does not include one and none has been added.
+- **No server database.** DataHub Studio uses browser-local IndexedDB for projects and the
+  shared workspace. That storage stays inside the current browser profile.
 - **No accounts.** There is no sign-in, no session, no user record, so there is no store of
   credentials to leak.
 - **No analytics or tracking.** No analytics script, tag manager, pixel or telemetry is loaded
@@ -155,8 +155,13 @@ removed by clearing site data for the site.
 | `hub_dashboards` | Dashboards workspace | Saved dashboards, including baked figures, which are aggregates of your data |
 | `bob_saved_views` | Data Analyzer, Save view | Filter selections, which include column names and values from your file |
 | `hub_recent_tools` | Hub landing page | The last five tools opened |
+| `hub_platform_recent` | Platform controls | Recently opened tools for Continue and Command Center |
+| `hub_favorite_tools` | Hub landing page | Favorite tool identifiers |
+| `hub_tool_view` | Hub landing page | Card or compact layout preference |
 | `hub_show_definitions` | Explanations toggle | Whether explanations are on |
 | `hub_theme` | Light and Dark toggle | Your theme choice |
+| `datahub_studio_active` | DataHub Studio | The identifier of the last open project |
+| `datahub_studio_local_ai` | DataHub Studio | Whether browser-local AI should be used when available |
 | `vanessa_memory` | Vanessa, opt-in and off by default | Lines you explicitly asked her to remember |
 | `vanessa_in_browser_model` | Vanessa, opt-in and off by default | Whether to use the in-browser model |
 
@@ -168,21 +173,13 @@ Two of these hold data derived from your files rather than mere preferences.
 picked, which are values out of your data. Neither holds raw rows, but if you would not want a
 column name or a region name sitting in your browser profile, do not save views or dashboards.
 
-**Your access code is never stored anywhere.** Not in `localStorage`, not in a cookie, not in
-the URL. That is why it has to be re-entered on every load.
+**During development there is no access-code gate.** Anyone who can open the deployed URL can
+open every tool. Real per-person restriction would require server-backed authentication.
 
-## The access code is a filter, not access control
-
-The keypad on the landing page decides which tool cards you see. It is a convenience feature
-for keeping each team's view uncluttered, and it is not a security boundary.
-
-Anyone who knows or guesses a tool's direct URL, for example `tools/data-analyzer/index.html`,
-can open it without entering a code. The codes are in the page source. Real per-person
-restriction would need a server with authentication, which is a different architecture from a
-static site.
-
-This is worth stating plainly to whoever asks: the hub is safe because your data stays on your
-machine, not because the keypad keeps anyone out.
+**IndexedDB storage:** `datahub_workspace` stores the one shared workspace file; `datahub_studio`
+stores named Studio projects, which can include raw rows, workflows, quality rules, comments,
+reports, and project history. Clear them from browser settings or from the relevant DataHub
+controls. They do not synchronize unless you explicitly export and transfer a project bundle.
 
 ## Where the guarantee actually rests
 
@@ -227,8 +224,9 @@ None of the above requires taking anyone's word for it.
   which fields each consent level transmits, that the consent level is never stored, that only
   `docs.google.com/spreadsheets` URLs produce a request, and that hostile text in a file cannot
   become an action.
-- **Check storage.** In developer tools under Application, look at Local Storage. You should
-  see only the keys in the table above, and never an access code or a consent level.
+- **Check storage.** In developer tools under Application, inspect Local Storage and IndexedDB.
+  IndexedDB contains the shared workspace and Studio projects; Local Storage contains preferences
+  and recent activity. Neither contains an access code.
 
 ## Reporting a problem
 

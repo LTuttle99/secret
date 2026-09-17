@@ -9,6 +9,7 @@ and a card on the landing page, and it's a new tool.
 
 | Tool | Folder | What it does |
 |---|---|---|
+| DataHub Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, transformations, quality monitoring, executive reports, PowerPoint/HTML export, custom tools, connections, collaboration bundles, and schedules |
 | Data Analyzer | `tools/data-analyzer/` | KPIs, forecasting, goal pacing, anomaly detection, AI insights on CSV, TSV, delimited text, JSON and Excel data |
 | File Diff | `tools/file-diff/` | Compares two files by a key column — added / removed / changed rows |
 | Pivot & Chart Explorer | `tools/pivot-explorer/` | Ad-hoc pivot table + chart on any file, no fixed schema |
@@ -127,6 +128,16 @@ library's output through `tools/shared/sanitize.js` before rendering.
   hub to be installed and cache visited pages for more resilient repeat use.
 - **Progressive controls** — sections explicitly labeled as advanced, options,
   settings, or configuration begin collapsed and can be revealed when needed.
+- **DataHub Studio** — named projects persist in IndexedDB and bring together
+  multiple datasets, inferred relationships, reusable workflow steps, lineage,
+  dictionaries, quality rules, reports, presentation mode, PowerPoint/HTML
+  export, custom tools, public HTTP/Google Sheets connections, portable team
+  bundles, and calendar schedules. Browser AI is used only when a compatible
+  local model is exposed; the deterministic private planner remains available.
+- **Guided data-source setup** — Vanessa asks where the data lives and gives a
+  step-by-step preparation, permission, privacy, and connection walkthrough for
+  local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,
+  SharePoint/OneDrive, SQLite, and Access.
 - **Search** — the search box on the landing page filters cards by name and
   description as you type; empty categories hide themselves automatically.
 - **Command center** — Ctrl+K (Cmd+K on Mac) searches every tool and runs global actions such as sample data, theme changes, and PDF export.
@@ -1160,23 +1171,18 @@ avoids that entirely.)
 
 ## Publishing
 
-The hub is hosted on **Azure Static Web Apps**, deployed from the GitHub repo
-by the workflow in `.github/workflows/`. Edit the files, commit, and push:
-the Action rebuilds and redeploys on every push to `main`. There is no build
-step, no server to restart, and nothing to redeploy manually.
+The hub is hosted with **GitHub Pages** from the GitHub repository. Edit the
+files, commit, and push to the configured Pages branch. There is no build step
+or application server to restart.
 
 The site is static end to end, so a deploy is just a file copy. If a change
 looks right at `http://localhost:8020` via `./serve.sh`, it will look the same
 once deployed.
 
-Two things to know if a backend is ever added (the Dashboard Builder data feed
-is the likely first case):
-
-- Static Web Apps includes managed Azure Functions on the free tier, but the
-  workflow ships with `api_location: ""`. It has to point at an `api` folder
-  before any function will deploy.
-- Static Web Apps does not include a database. Persisting anything means
-  adding a separate resource such as Table Storage or Cosmos DB.
+GitHub Pages cannot run backend code. True accounts, server-side schedules,
+private database connections, and live multi-user collaboration would require
+a separate HTTPS API and database. Studio therefore keeps projects locally,
+uses public HTTP data sources, and exports portable bundles and calendar events.
 
 ## Renaming the hub
 

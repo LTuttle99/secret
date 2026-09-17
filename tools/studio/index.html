@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#00133c">
+  <title>DataHub Studio</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="../../manifest.webmanifest">
+  <link rel="stylesheet" href="../shared/platform.css">
+  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="source-guide.css">
+  <script src="../shared/theme.js"></script>
+</head>
+<body>
+  <header class="studio-topbar">
+    <div class="brand-row">
+      <a href="../../index.html" class="back-link">← Hub</a>
+      <div class="brand-mark">S</div>
+      <div>
+        <h1>DataHub Studio</h1>
+        <p>Projects, workflows, reports, and automation</p>
+      </div>
+    </div>
+    <div class="project-controls">
+      <select id="project-select" aria-label="Current project"></select>
+      <button id="new-project-btn" class="button ghost">New project</button>
+      <button id="save-project-btn" class="button primary">Save</button>
+    </div>
+  </header>
+
+  <div class="studio-shell">
+    <aside class="studio-sidebar" aria-label="Studio sections">
+      <nav id="studio-nav">
+        <button data-view="overview" class="nav-item active"><span>⌂</span>Overview</button>
+        <button data-view="data" class="nav-item"><span>▦</span>Data</button>
+        <button data-view="workflow" class="nav-item"><span>⌁</span>Workflow</button>
+        <button data-view="dictionary" class="nav-item"><span>Aa</span>Dictionary</button>
+        <button data-view="quality" class="nav-item"><span>✓</span>Quality</button>
+        <button data-view="report" class="nav-item"><span>▤</span>Report</button>
+        <button data-view="automate" class="nav-item"><span>↻</span>Automate</button>
+        <button data-view="builder" class="nav-item"><span>＋</span>Tool Builder</button>
+      </nav>
+      <div class="sidebar-status">
+        <span class="status-dot"></span>
+        <div><strong>Local-first</strong><small id="ai-status">Deterministic engine</small></div>
+      </div>
+    </aside>
+
+    <main class="studio-main">
+      <section id="view-overview" class="studio-view active">
+        <div class="view-heading">
+          <div><span class="eyebrow">Workspace</span><h2 id="overview-title">Untitled project</h2><p>Everything for this analysis lives together and stays in this browser.</p></div>
+          <button class="button ghost" id="export-project-btn">Export project</button>
+        </div>
+
+        <div class="metric-grid" id="overview-metrics"></div>
+
+        <div class="overview-grid">
+          <article class="surface hero-surface">
+            <span class="eyebrow light">Ask Vanessa</span>
+            <h3>What should this project accomplish?</h3>
+            <textarea id="project-goal" rows="3" placeholder="Example: Clean these monthly files, flag quality problems, analyze revenue, and prepare an executive report."></textarea>
+            <div class="action-row">
+              <button id="goal-plan-btn" class="button white">Build my workflow</button>
+              <button id="goal-ai-btn" class="button glass">Use local AI when available</button>
+            </div>
+            <div id="goal-response" class="assistant-response" hidden></div>
+          </article>
+
+          <article class="surface">
+            <div class="surface-head"><div><span class="eyebrow">Recent activity</span><h3>Project timeline</h3></div></div>
+            <div id="activity-list" class="activity-list"></div>
+          </article>
+        </div>
+
+        <article class="surface">
+          <div class="surface-head"><div><span class="eyebrow">Quick start</span><h3>Common analytics recipes</h3></div></div>
+          <div id="recipe-gallery" class="recipe-gallery"></div>
+        </article>
+      </section>
+
+      <section id="view-data" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Multi-file workspace</span><h2>Data catalog</h2><p>Drop files together. Studio profiles their schemas and suggests relationships.</p></div><div class="action-row"><label class="button ghost file-button">Choose folder<input id="studio-folder-input" type="file" webkitdirectory multiple hidden></label><button id="sample-project-btn" class="button ghost">Load sample project</button></div></div>
+        <article class="source-guide-card">
+          <div class="source-guide-avatar">V</div>
+          <div class="source-guide-copy"><span class="eyebrow light">Vanessa’s connection guide</span><h3>Where does your data live?</h3><p>Choose a source—or describe it in your own words—and I’ll explain exactly how to prepare it, what permissions you need, what stays private, and how to connect it.</p><div id="source-guide-options" class="source-guide-options"></div><form id="source-question-form" class="source-question-form"><input id="source-question" placeholder="Example: Our data is in a private SQL Server database"><button type="submit">Show me how</button></form></div>
+        </article>
+        <label class="drop-zone" id="studio-drop-zone">
+          <input id="studio-file-input" type="file" multiple accept=".csv,.tsv,.txt,.json,.xlsx,.xls,.xlsm,.zip" hidden>
+          <strong>Drop files or a folder export here</strong>
+          <span>CSV, Excel, JSON, and delimited text · multiple files supported</span>
+        </label>
+        <div id="relationship-suggestions" class="suggestion-strip" hidden></div>
+        <div id="dataset-list" class="dataset-grid"></div>
+        <article class="surface connector-panel">
+          <div class="surface-head"><div><span class="eyebrow">Live connections</span><h3>Connect a public data source</h3></div></div>
+          <div class="inline-form"><select id="connector-type"><option value="google">Public Google Sheet</option><option value="http">CSV or JSON URL</option><option value="database">Database gateway</option></select><input id="connector-url" type="url" placeholder="Paste a public link"><button id="connect-btn" class="button primary">Connect</button></div>
+          <p id="connector-note" class="fine-print">Connections refresh when this project opens. Private databases require an HTTPS gateway because GitHub Pages cannot open database sockets.</p>
+        </article>
+      </section>
+
+      <section id="view-workflow" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Repeatable recipes</span><h2>Workflow canvas</h2><p>Arrange steps, preview the recipe, and rerun it on replacement files.</p></div><div class="action-row"><button id="undo-step-btn" class="button ghost">Undo</button><button id="run-workflow-btn" class="button primary">Run workflow</button></div></div>
+        <div class="workflow-layout">
+          <aside class="step-library surface"><h3>Add a step</h3><div id="step-library"></div><button id="natural-step-btn" class="button ghost full">Describe a transformation</button></aside>
+          <div class="workflow-canvas"><div class="workflow-source"><span>Source</span><strong id="workflow-source-name">Choose a dataset</strong></div><div id="workflow-nodes"></div><div class="workflow-output"><span>Output</span><strong id="workflow-output-summary">Ready to run</strong></div></div>
+          <aside class="surface inspector"><h3>Run history</h3><div id="run-history" class="activity-list"></div></aside>
+        </div>
+      </section>
+
+      <section id="view-dictionary" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Automatic catalog</span><h2>Data dictionary</h2><p>Types, completeness, uniqueness, examples, and likely meanings for every field.</p></div><button id="download-dictionary-btn" class="button ghost">Download dictionary</button></div>
+        <div class="surface table-shell"><table><thead><tr><th>Column</th><th>Type</th><th>Complete</th><th>Unique</th><th>Example</th><th>Role</th></tr></thead><tbody id="dictionary-body"></tbody></table></div>
+      </section>
+
+      <section id="view-quality" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Monitoring</span><h2>Data quality rules</h2><p>Turn expectations into repeatable checks for every new version of a file.</p></div><button id="run-quality-btn" class="button primary">Run checks</button></div>
+        <div class="quality-layout">
+          <article class="surface"><h3>Add a rule</h3><div class="form-grid"><select id="rule-column"></select><select id="rule-type"><option value="required">Cannot be blank</option><option value="unique">Must be unique</option><option value="nonnegative">Cannot be negative</option><option value="allowed">Must use approved values</option><option value="future">Cannot be a future date</option></select><input id="rule-value" placeholder="Approved values, separated by commas"><button id="add-rule-btn" class="button primary">Add rule</button></div><div id="quality-rules" class="rule-list"></div></article>
+          <article class="surface score-card"><span class="eyebrow">Current grade</span><div id="quality-score" class="quality-score">—</div><p id="quality-summary">Run the checks to grade this dataset.</p><div id="quality-results" class="quality-results"></div></article>
+        </div>
+      </section>
+
+      <section id="view-report" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Executive output</span><h2>Report Studio</h2><p>Turn the current project into a concise narrative with evidence and recommendations.</p></div><div class="action-row"><button id="generate-report-btn" class="button primary">Generate report</button><button id="present-report-btn" class="button ghost">Present</button><button id="download-pptx-btn" class="button ghost">PowerPoint</button><button id="download-report-btn" class="button ghost">HTML</button></div></div>
+        <article id="report-canvas" class="report-canvas"></article>
+      </section>
+
+      <section id="view-automate" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Connections and cadence</span><h2>Automation</h2><p>Plan recurring work locally or export a calendar reminder. Server execution can be connected later.</p></div></div>
+        <div class="automation-grid">
+          <article class="surface"><h3>Schedule a report</h3><div class="form-grid"><input id="schedule-name" placeholder="Monday performance report"><select id="schedule-frequency"><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="quarterly">Quarterly</option></select><input id="schedule-date" type="date"><button id="add-schedule-btn" class="button primary">Add schedule</button></div><div id="schedule-list" class="rule-list"></div></article>
+          <article class="surface"><h3>Collaboration</h3><p class="muted">Track roles, comments, and project snapshots locally, then share them in a portable project bundle.</p><div class="inline-form" style="grid-template-columns:1fr 120px auto;margin-top:14px"><input id="member-name" placeholder="Teammate name"><select id="member-role"><option>Viewer</option><option>Editor</option><option>Owner</option></select><button id="add-member-btn" class="button ghost">Add</button></div><div class="inline-form" style="grid-template-columns:1fr auto;margin-top:9px"><input id="comment-text" placeholder="Add a project comment"><button id="add-comment-btn" class="button ghost">Comment</button></div><div id="collaboration-list" class="rule-list"></div><div class="stack" style="margin-top:14px"><button id="snapshot-btn" class="button ghost">Save version snapshot</button><button id="share-project-btn" class="button primary">Create collaboration bundle</button><label class="button ghost file-button">Import bundle<input id="import-project-input" type="file" accept=".json" hidden></label><button id="calendar-btn" class="button ghost">Export schedules to calendar</button></div></article>
+          <article class="surface"><h3>AI engine</h3><div class="setting-row"><div><strong>Browser AI</strong><span>Use a local browser model when supported.</span></div><label class="switch"><input id="local-ai-toggle" type="checkbox"><span></span></label></div><div class="setting-row"><div><strong>Private fallback</strong><span>Keep deterministic recommendations when no model is available.</span></div><span class="badge good">Always on</span></div><p id="ai-detail" class="fine-print"></p></article>
+        </div>
+      </section>
+
+      <section id="view-builder" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Personal toolbox</span><h2>Tool Builder</h2><p>Package a workflow into a reusable tool without writing code.</p></div></div>
+        <div class="builder-layout">
+          <article class="surface"><div class="form-grid"><input id="custom-tool-name" placeholder="Tool name"><textarea id="custom-tool-purpose" rows="3" placeholder="What should this tool accomplish?"></textarea><button id="build-tool-btn" class="button primary">Build tool</button></div></article>
+          <div id="custom-tool-list" class="dataset-grid"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div id="studio-dialog" class="dialog-shell" hidden><div class="dialog-card"><button class="dialog-close" aria-label="Close">×</button><div id="dialog-content"></div></div></div>
+  <div id="studio-toast" class="studio-toast" hidden></div>
+
+  <script src="../shared/parse.js"></script>
+  <script src="studio.js"></script>
+  <script src="../shared/platform.js"></script>
+</body>
+</html>
