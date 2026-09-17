@@ -44,6 +44,53 @@
         }
         .tool-card:hover { transform: translateY(-5px) !important; }
         .tool-card:hover::after { opacity: 1; }
+        .tool-card .mini-preview {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            transform: translateY(8px);
+            transition: max-height .3s ease, opacity .3s ease, transform .3s ease, margin .3s ease;
+        }
+        .tool-card:hover .mini-preview,
+        .tool-card:focus-visible .mini-preview {
+            max-height: 52px;
+            opacity: 1;
+            transform: translateY(0);
+            margin-top: .9rem;
+        }
+        .favorite-button {
+            position: absolute;
+            top: .72rem;
+            right: .72rem;
+            z-index: 3;
+            width: 2rem;
+            height: 2rem;
+            border-radius: 999px;
+            background: rgba(255,255,255,.92);
+            border: 1px solid #e2e8f0;
+            color: #94a3b8;
+            display: grid;
+            place-items: center;
+            transition: color .2s ease, transform .2s ease, border-color .2s ease;
+        }
+        .favorite-button:hover { color: #dc6803; border-color: #fdba74; transform: scale(1.08); }
+        .favorite-button.is-favorite { color: #dc6803; background: #fff7ed; border-color: #fed7aa; }
+        .category-heading { cursor: pointer; user-select: none; }
+        .category-heading .category-chevron { transition: transform .25s ease; }
+        [data-collapsed="true"] .category-heading .category-chevron { transform: rotate(-90deg); }
+        [data-collapsed="true"] > .grid { display: none; }
+        .filter-pill[aria-pressed="true"] { background: #00133c; color: white; border-color: #00133c; }
+        .view-button[aria-pressed="true"] { background: #eaf2ff; color: #0062f1; }
+        #tool-catalog.compact-view [data-category-section] > .grid { grid-template-columns: 1fr; gap: .65rem; }
+        #tool-catalog.compact-view .tool-card { min-height: 0; padding: 1rem 1.1rem; display: grid; grid-template-columns: 2.5rem 1fr auto; column-gap: .9rem; align-items: center; }
+        #tool-catalog.compact-view .tool-card > div[aria-hidden] { margin: 0; width: 2.5rem; height: 2.5rem; grid-row: 1 / span 2; }
+        #tool-catalog.compact-view .tool-card h4 { margin: 0; }
+        #tool-catalog.compact-view .tool-card > p,
+        #tool-catalog.compact-view .tool-card > span:not(.tool-status),
+        #tool-catalog.compact-view .mini-preview { display: none; }
+        #tool-catalog.compact-view .tool-status { position: static; grid-column: 3; grid-row: 1; }
+        #tool-catalog.compact-view .favorite-button { position: static; grid-column: 3; grid-row: 2; justify-self: end; }
+        #finder-result { transition: opacity .25s ease, transform .25s ease; }
         .scroll-reveal {
             opacity: 0;
             transform: translateY(42px) scale(.975);
@@ -143,6 +190,27 @@
             </p>
         </section>
 
+        <section id="vanessa-finder" data-reveal class="relative overflow-hidden rounded-3xl bg-[#00133C] text-white p-6 sm:p-9 shadow-2xl shadow-blue-950/15">
+            <div class="absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#0062F1]/30 blur-2xl" aria-hidden="true"></div>
+            <div class="relative grid gap-7 lg:grid-cols-[1.1fr_.9fr] lg:items-end">
+                <div>
+                    <span class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[.16em] text-blue-200 mb-4">
+                        <span class="h-2 w-2 rounded-full bg-[#DC6803]"></span> Ask Vanessa
+                    </span>
+                    <h3 class="font-serif-brand text-3xl sm:text-4xl leading-tight mb-3">What are you trying to accomplish?</h3>
+                    <p class="text-sm sm:text-base text-slate-300 leading-relaxed max-w-xl">Describe the outcome in plain English. Vanessa will match you with the best tool and explain why it fits.</p>
+                </div>
+                <form id="tool-finder-form" class="relative" autocomplete="off">
+                    <label for="tool-finder-input" class="sr-only">Describe what you need to do</label>
+                    <textarea id="tool-finder-input" rows="3" placeholder="Try: I need to compare two spreadsheets and find what changed" class="w-full resize-none rounded-2xl border border-white/15 bg-white/10 px-4 py-4 pr-28 text-base text-white placeholder:text-slate-400 focus:border-[#0062F1] focus:bg-white/[.14] focus:outline-none focus:ring-4 focus:ring-[#0062F1]/20"></textarea>
+                    <button type="submit" class="absolute bottom-3 right-3 rounded-xl bg-[#0062F1] px-4 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 focus:outline-none focus:ring-2 focus:ring-white">Find my tool</button>
+                </form>
+            </div>
+            <div id="finder-result" class="relative hidden mt-6 rounded-2xl border border-white/10 bg-white/10 p-4" aria-live="polite"></div>
+        </section>
+
+        <section id="featured-tool" data-reveal class="hidden"></section>
+
         <a href="https://tldr.tech" target="_blank" rel="noopener noreferrer" data-reveal
            class="group block max-w-2xl bg-white border border-slate-200 hover:border-[#DC6803] rounded-xl p-5 shadow-sm hover:shadow-md transition-all">
             <div class="flex flex-col sm:flex-row sm:items-center gap-4">
@@ -170,8 +238,10 @@
             <div id="recent-list" class="flex flex-wrap gap-2"></div>
         </section>
 
-        <section data-reveal class="sticky top-[73px] z-20 py-3 -mx-3 px-3 bg-slate-50/85 backdrop-blur-xl rounded-2xl">
-            <div class="relative max-w-xl">
+        <section data-reveal class="sticky top-[73px] z-20 py-3 -mx-3 px-3 bg-slate-50/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-sm">
+            <div class="flex flex-col gap-3">
+            <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <div class="relative max-w-xl flex-1">
                 <label for="tool-search" class="sr-only">Search tools</label>
                 <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
@@ -180,9 +250,19 @@
                     class="w-full bg-white border border-slate-300 rounded-lg text-sm pl-9 pr-3 py-2.5 text-slate-900 focus:border-[#0062F1] focus:ring-2 focus:ring-[#0062F1]/20 focus:outline-none">
             </div>
 
+            <div class="flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1 self-start" aria-label="Tool display">
+                <button type="button" class="view-button rounded-md px-2.5 py-1.5 text-xs font-semibold text-slate-500" data-view="cards" aria-pressed="true">Cards</button>
+                <button type="button" class="view-button rounded-md px-2.5 py-1.5 text-xs font-semibold text-slate-500" data-view="compact" aria-pressed="false">Compact</button>
+            </div>
+            </div>
+
+            <div id="category-filters" class="flex gap-2 overflow-x-auto pb-1" aria-label="Filter tools by category"></div>
+
             <p id="no-results" class="hidden text-sm text-slate-500 italic mt-4">No tools match "<span id="no-results-query"></span>".</p>
+            </div>
         </section>
 
+        <div id="tool-catalog" class="space-y-10">
         <section data-category-section>
             <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Explore &amp; Analyze</h3>
 
@@ -540,6 +620,8 @@
 
         </div>
 
+        </div>
+
     </main>
 
     <footer id="hub-footer" class="max-w-6xl mx-auto px-5 sm:px-8 py-8 text-xs text-slate-500 border-t border-slate-200 mt-4 space-y-1">
@@ -552,6 +634,7 @@
         const noResultsEl = document.getElementById('no-results');
         const noResultsQueryEl = document.getElementById('no-results-query');
         const categorySections = Array.from(document.querySelectorAll('[data-category-section]'));
+        let activeCategory = 'all';
 
         function filterTools() {
             const query = searchInput.value.trim().toLowerCase();
@@ -564,7 +647,10 @@
                 sectionCards.forEach((card) => {
                     const text = card.innerText.toLowerCase();
                     const matchesQuery = query === '' || text.includes(query);
-                    const matches = matchesQuery;
+                    const matchesCategory = activeCategory === 'all'
+                        || section.dataset.category === activeCategory
+                        || (activeCategory === 'favorites' && readFavorites().includes(card.dataset.tool));
+                    const matches = matchesQuery && matchesCategory;
                     card.classList.toggle('hidden', !matches);
                     if (matches) visibleInSection++;
                 });
@@ -580,13 +666,117 @@
         searchInput.addEventListener('input', filterTools);
 
         const allCards = Array.from(document.querySelectorAll('.tool-card'));
+        const FAVORITES_KEY = 'hub_favorite_tools';
+
+        function readFavorites() {
+            try {
+                const value = JSON.parse(localStorage.getItem(FAVORITES_KEY) || '[]');
+                return Array.isArray(value) ? value : [];
+            } catch (err) { return []; }
+        }
+
+        function saveFavorites(items) {
+            try { localStorage.setItem(FAVORITES_KEY, JSON.stringify(items)); } catch (err) { return; }
+        }
+
+        function decorateCatalog() {
+            const labels = { 'data-analyzer': 'Popular', 'instant-dashboard': 'Popular', 'dashboard-builder': 'Updated', 'stat-tests': 'New' };
+            const favorites = new Set(readFavorites());
+
+            categorySections.forEach((section, index) => {
+                const heading = section.querySelector('h3');
+                const category = heading.textContent.trim();
+                section.dataset.category = String(index);
+                heading.classList.add('category-heading');
+                heading.tabIndex = 0;
+                heading.setAttribute('role', 'button');
+                heading.setAttribute('aria-expanded', 'true');
+                heading.innerHTML = `<span class="category-chevron text-[#0062F1]" aria-hidden="true">⌄</span><span>${category}</span>`;
+                const toggle = () => {
+                    const collapsed = section.dataset.collapsed === 'true';
+                    section.dataset.collapsed = collapsed ? 'false' : 'true';
+                    heading.setAttribute('aria-expanded', collapsed ? 'true' : 'false');
+                };
+                heading.addEventListener('click', toggle);
+                heading.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); toggle(); }
+                });
+
+                section.querySelectorAll('.tool-card').forEach((card) => {
+                    card.dataset.category = String(index);
+                    const title = card.querySelector('h4');
+                    if (labels[card.dataset.tool]) {
+                        const label = document.createElement('span');
+                        label.className = 'ml-2 align-middle rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#DC6803]';
+                        label.textContent = labels[card.dataset.tool];
+                        title.appendChild(label);
+                    }
+
+                    const favorite = document.createElement('button');
+                    favorite.type = 'button';
+                    favorite.className = `favorite-button${favorites.has(card.dataset.tool) ? ' is-favorite' : ''}`;
+                    favorite.setAttribute('aria-label', `${favorites.has(card.dataset.tool) ? 'Remove' : 'Add'} ${toolTitle(card)} ${favorites.has(card.dataset.tool) ? 'from' : 'to'} favorites`);
+                    favorite.innerHTML = favorites.has(card.dataset.tool) ? '★' : '☆';
+                    favorite.addEventListener('click', (event) => {
+                        event.preventDefault(); event.stopPropagation();
+                        const current = new Set(readFavorites());
+                        if (current.has(card.dataset.tool)) current.delete(card.dataset.tool); else current.add(card.dataset.tool);
+                        saveFavorites([...current]);
+                        decorateFavoriteState();
+                        renderFeatured();
+                    });
+                    card.appendChild(favorite);
+
+                    const preview = document.createElement('div');
+                    preview.className = 'mini-preview border-t border-slate-100';
+                    preview.innerHTML = '<div class="flex gap-1.5 pt-3"><span class="h-2 w-1/2 rounded-full bg-blue-100"></span><span class="h-2 w-1/4 rounded-full bg-orange-100"></span><span class="h-2 flex-1 rounded-full bg-slate-100"></span></div><div class="mt-2 h-2 w-2/3 rounded-full bg-slate-100"></div>';
+                    card.appendChild(preview);
+                });
+            });
+        }
+
+        function decorateFavoriteState() {
+            const favorites = new Set(readFavorites());
+            allCards.forEach((card) => {
+                const button = card.querySelector('.favorite-button');
+                const active = favorites.has(card.dataset.tool);
+                button.classList.toggle('is-favorite', active);
+                button.innerHTML = active ? '★' : '☆';
+                button.setAttribute('aria-label', `${active ? 'Remove' : 'Add'} ${toolTitle(card)} ${active ? 'from' : 'to'} favorites`);
+            });
+            renderRecent();
+        }
+
+        function buildCategoryFilters() {
+            const target = document.getElementById('category-filters');
+            const filters = [{ id: 'all', label: 'All tools' }, { id: 'favorites', label: '★ Favorites' }].concat(
+                categorySections.map((section, index) => ({ id: String(index), label: section.querySelector('h3 span:last-child').textContent }))
+            );
+            target.innerHTML = filters.map((filter) => `<button type="button" data-filter="${filter.id}" aria-pressed="${filter.id === 'all'}" class="filter-pill whitespace-nowrap rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition-colors">${filter.label}</button>`).join('');
+            target.querySelectorAll('[data-filter]').forEach((button) => button.addEventListener('click', () => {
+                activeCategory = button.dataset.filter;
+                target.querySelectorAll('[data-filter]').forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+                categorySections.forEach(section => { section.dataset.collapsed = 'false'; section.querySelector('h3').setAttribute('aria-expanded', 'true'); });
+                filterTools();
+            }));
+        }
+
+        function renderFeatured() {
+            const target = document.getElementById('featured-tool');
+            const preferred = readFavorites()[0] || readRecent()[0] || 'data-analyzer';
+            const card = cardFor(preferred) || allCards[0];
+            if (!card) return;
+            target.classList.remove('hidden');
+            target.innerHTML = `<div class="grid gap-5 rounded-3xl border border-blue-100 bg-gradient-to-br from-white to-blue-50 p-6 sm:grid-cols-[1fr_auto] sm:items-center sm:p-8 shadow-sm"><div><p class="mb-2 text-xs font-bold uppercase tracking-[.16em] text-[#0062F1]">Featured for you</p><h3 class="font-serif-brand text-2xl text-[#00133C]">${toolTitle(card)}</h3><p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-600">${card.querySelector('p').textContent.trim()}</p></div><a href="${card.getAttribute('href')}" data-featured="${card.dataset.tool}" class="inline-flex items-center justify-center rounded-xl bg-[#00133C] px-5 py-3 text-sm font-semibold text-white hover:bg-[#0062F1]">Open tool <span class="ml-2">→</span></a></div>`;
+            target.querySelector('[data-featured]').addEventListener('click', () => recordRecent(card.dataset.tool));
+        }
 
         function initStatusBadges() {
             allCards.forEach((card) => {
                 card.classList.add('relative');
                 if (card.dataset.local === 'true') return;
                 const badge = document.createElement('span');
-                badge.className = 'tool-status absolute top-3 right-3 flex items-center gap-1 text-[10px] font-medium';
+                badge.className = 'tool-status absolute top-4 right-12 flex items-center gap-1 text-[10px] font-medium';
                 badge.innerHTML = `
                     <span class="status-dot h-1.5 w-1.5 rounded-full bg-slate-300"></span>
                     <span class="status-label text-slate-400">Checking</span>
@@ -691,7 +881,7 @@
 
         function toolTitle(card) {
             const heading = card.querySelector('h4');
-            return heading ? heading.innerText.trim() : card.dataset.tool;
+            return heading ? (heading.childNodes[0]?.textContent || heading.innerText).trim() : card.dataset.tool;
         }
 
         function renderRecent() {
@@ -718,6 +908,65 @@
         allCards.forEach(card => {
             card.addEventListener('click', () => recordRecent(card.dataset.tool));
         });
+
+        const finderAliases = {
+            'data-analyzer': ['forecast', 'kpi', 'insight', 'anomaly', 'analyze data', 'performance', 'trend'],
+            'instant-dashboard': ['automatic dashboard', 'quick dashboard', 'visualize file', 'show my data'],
+            'dashboard-builder': ['custom dashboard', 'build dashboard', 'share dashboard', 'layout'],
+            'file-diff': ['compare files', 'compare spreadsheets', 'what changed', 'difference between files'],
+            'data-cleaner': ['clean data', 'messy data', 'missing values', 'standardize'],
+            'fuzzy-dupes': ['duplicate', 'similar names', 'deduplicate', 'near match'],
+            'lookup-merge': ['merge', 'join files', 'lookup', 'combine spreadsheets'],
+            'sql-workbench': ['sql', 'query', 'join tables', 'database'],
+            'pivot-explorer': ['pivot', 'group data', 'summarize', 'cross tab'],
+            'chart-builder': ['chart', 'graph', 'visual'],
+            'column-stats': ['statistics', 'mean', 'median', 'column summary'],
+            'stat-tests': ['test significance', 'anova', 't test', 'correlation'],
+            'converter': ['convert format', 'csv to json', 'excel to csv'],
+            'qr-generator': ['qr', 'qr code'],
+            'json-formatter': ['format json', 'validate json', 'minify json'],
+            'regex-tester': ['regex', 'regular expression', 'pattern'],
+            'text-diff': ['compare text', 'text changes'],
+            'text-analyzer': ['word count', 'analyze text', 'reading time'],
+            'markdown-preview': ['markdown', 'preview markdown'],
+            'timestamp-converter': ['timestamp', 'unix time', 'date conversion'],
+            'unit-converter': ['units', 'convert measurement'],
+            'code-helper': ['code', 'developer helper', 'snippet'],
+            'color-tools': ['color', 'palette', 'hex', 'rgb'],
+            'data-generator': ['fake data', 'sample data', 'test data'],
+            'encode-decode': ['base64', 'url encode', 'decode'],
+            'jwt-decoder': ['jwt', 'token']
+        };
+
+        function findBestTool(query) {
+            const words = query.toLowerCase().split(/[^a-z0-9]+/).filter(word => word.length > 2);
+            return allCards.map(card => {
+                const haystack = `${toolTitle(card)} ${card.querySelector('p')?.textContent || ''} ${(finderAliases[card.dataset.tool] || []).join(' ')}`.toLowerCase();
+                let score = words.reduce((total, word) => total + (haystack.includes(word) ? 2 : 0), 0);
+                (finderAliases[card.dataset.tool] || []).forEach(alias => { if (query.toLowerCase().includes(alias)) score += 8; });
+                return { card, score };
+            }).sort((a, b) => b.score - a.score)[0];
+        }
+
+        document.getElementById('tool-finder-form').addEventListener('submit', (event) => {
+            event.preventDefault();
+            const input = document.getElementById('tool-finder-input');
+            const result = document.getElementById('finder-result');
+            const query = input.value.trim();
+            if (!query) { input.focus(); return; }
+            const match = findBestTool(query);
+            const card = match.card;
+            result.classList.remove('hidden');
+            result.innerHTML = `<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa recommends</p><p class="mt-1 text-lg font-semibold">${toolTitle(card)}</p><p class="mt-1 text-sm text-slate-300">${match.score > 0 ? 'This is the closest match for what you described.' : 'I’m not completely sure, but this is the best place to start.'}</p></div><a href="${card.getAttribute('href')}" data-finder-tool="${card.dataset.tool}" class="shrink-0 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#00133C] hover:bg-blue-50">Take me there →</a></div>`;
+            result.querySelector('[data-finder-tool]').addEventListener('click', () => recordRecent(card.dataset.tool));
+        });
+
+        document.querySelectorAll('.view-button').forEach((button) => button.addEventListener('click', () => {
+            const compact = button.dataset.view === 'compact';
+            document.getElementById('tool-catalog').classList.toggle('compact-view', compact);
+            document.querySelectorAll('.view-button').forEach(item => item.setAttribute('aria-pressed', String(item === button)));
+            try { localStorage.setItem('hub_tool_view', compact ? 'compact' : 'cards'); } catch (err) { return; }
+        }));
 
         const paletteOverlay = document.getElementById('palette-overlay');
         const paletteInput = document.getElementById('palette-input');
@@ -807,10 +1056,18 @@
             }
         });
 
+        decorateCatalog();
+        buildCategoryFilters();
         initStatusBadges();
         filterTools();
         renderRecent();
+        renderFeatured();
         runStatusChecks();
+        try {
+            if (localStorage.getItem('hub_tool_view') === 'compact') {
+                document.querySelector('[data-view="compact"]').click();
+            }
+        } catch (err) { /* keep card view */ }
         window.addEventListener('load', () => {
             if (typeof vanessaInit === 'function') vanessaInit({ tool: 'hub' });
         });
