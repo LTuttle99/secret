@@ -118,12 +118,13 @@
   }
 
   function blankProject(name = "Untitled project") {
-    return { id: uid("project"), name, goal: "", createdAt: Date.now(), updatedAt: Date.now(), datasets: [], activeDatasetId: null, steps: [], rules: [], report: null, schedules: [], customTools: [], connections: [], members: [], comments: [], versions: [], activities: [{ text: "Project created", at: nowLabel() }], runs: [] };
+    return { id: uid("project"), name, goal: "", createdAt: Date.now(), updatedAt: Date.now(), datasets: [], activeDatasetId: null, steps: [], rules: [], report: null, schedules: [], customTools: [], connections: [], members: [], comments: [], versions: [], activities: [{ text: "Project created", at: nowLabel() }], runs: [], mappings: [], joins: [], glossary: [], metrics: [], contracts: [], anomalies: [], privacyFindings: [], approvals: [], dashboardPlans: [], projectStatus: "Draft", readiness: null };
   }
 
   function normalizeProject(project) {
-    for (const key of ["datasets", "steps", "rules", "schedules", "customTools", "connections", "members", "comments", "versions", "activities", "runs"]) if (!Array.isArray(project[key])) project[key] = [];
+    for (const key of ["datasets", "steps", "rules", "schedules", "customTools", "connections", "members", "comments", "versions", "activities", "runs", "mappings", "joins", "glossary", "metrics", "contracts", "anomalies", "privacyFindings", "approvals", "dashboardPlans"]) if (!Array.isArray(project[key])) project[key] = [];
     if (!project.name) project.name = "Untitled project";
+    if (!project.projectStatus) project.projectStatus = "Draft";
     return project;
   }
 
@@ -159,6 +160,7 @@
     $("#overview-title").textContent = state.project.name;
     $("#project-goal").value = state.project.goal || "";
     renderProjectSelect(); renderMetrics(); renderActivities(); renderRecipes(); renderSourceGuideOptions(); renderDatasets(); renderWorkflow(); renderDictionary(); renderRules(); renderReport(); renderSchedules(); renderCollaboration(); renderCustomTools(); renderAi();
+    window.dispatchEvent(new CustomEvent("datahub:project-render"));
   }
 
   function renderSourceGuideOptions() {
@@ -588,5 +590,6 @@
     if (due) { await saveProject(true); toast(`${due} scheduled report${due === 1 ? " was" : "s were"} generated when Studio opened.`); }
   }
 
+  window.DataHubStudio = { state, uid, activeDataset, addActivity, markDirty, renderAll, saveProject, toast, dialog, closeDialog, escapeHtml, download, showView };
   init();
 })();

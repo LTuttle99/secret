@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="../shared/platform.css">
   <link rel="stylesheet" href="studio.css">
   <link rel="stylesheet" href="source-guide.css">
+  <link rel="stylesheet" href="intelligence.css">
   <script src="../shared/theme.js"></script>
 </head>
 <body>
@@ -43,6 +44,7 @@
         <button data-view="workflow" class="nav-item"><span>⌁</span>Workflow</button>
         <button data-view="dictionary" class="nav-item"><span>Aa</span>Dictionary</button>
         <button data-view="quality" class="nav-item"><span>✓</span>Quality</button>
+        <button data-view="intelligence" class="nav-item"><span>✦</span>Intelligence</button>
         <button data-view="report" class="nav-item"><span>▤</span>Report</button>
         <button data-view="automate" class="nav-item"><span>↻</span>Automate</button>
         <button data-view="builder" class="nav-item"><span>＋</span>Tool Builder</button>
@@ -128,6 +130,63 @@
         </div>
       </section>
 
+      <section id="view-intelligence" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Data intelligence</span><h2>Understand, trust, and govern</h2><p>Map your data, define its meaning, ask questions, protect sensitive fields, and prepare it for production.</p></div><span id="intel-project-status" class="approval-pill">Draft</span></div>
+        <div class="intel-tabs" role="tablist" aria-label="Intelligence tools">
+          <button class="active" data-intel-tab="structure">Structure</button>
+          <button data-intel-tab="semantics">Meaning</button>
+          <button data-intel-tab="ask">Ask &amp; monitor</button>
+          <button data-intel-tab="privacy">Privacy</button>
+          <button data-intel-tab="governance">Governance</button>
+          <button data-intel-tab="deploy">Deploy</button>
+        </div>
+
+        <div id="intel-structure" class="intel-panel active">
+          <div class="intel-grid two">
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Column mapping</span><h3>What does each field mean?</h3></div><button id="infer-mappings-btn" class="button ghost">Suggest roles</button></div><p class="muted">Assign business roles so downstream tools know which fields are IDs, dates, measures, categories, or sensitive data.</p><div class="table-shell compact-table"><table><thead><tr><th>Column</th><th>Detected type</th><th>Business role</th></tr></thead><tbody id="mapping-body"></tbody></table></div></article>
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Join assistant</span><h3>Combine related files</h3></div></div><div class="join-builder"><select id="join-left"></select><select id="join-left-key"></select><span>＋</span><select id="join-right"></select><select id="join-right-key"></select></div><div class="action-row"><button id="analyze-join-btn" class="button ghost">Analyze join</button><button id="create-join-btn" class="button primary">Create joined dataset</button></div><div id="join-analysis" class="intel-result empty">Choose two datasets to inspect match rate and duplication risk.</div></article>
+          </div>
+        </div>
+
+        <div id="intel-semantics" class="intel-panel">
+          <div class="intel-grid three">
+            <article class="surface"><span class="eyebrow">Business glossary</span><h3>Shared language</h3><form id="glossary-form" class="form-grid"><input id="glossary-term" placeholder="Term, e.g. Active customer"><textarea id="glossary-definition" rows="3" placeholder="Definition and inclusion rules"></textarea><button class="button primary">Add definition</button></form><div id="glossary-list" class="intel-list"></div></article>
+            <article class="surface"><span class="eyebrow">Metric builder</span><h3>Reusable calculations</h3><form id="metric-form" class="form-grid"><input id="metric-name" placeholder="Metric name"><input id="metric-formula" placeholder="SUM(revenue) / COUNTD(customer_id)"><button class="button primary">Create metric</button></form><p class="fine-print">Supports SUM, AVG, MIN, MAX, COUNT, and COUNTD.</p><div id="metric-list" class="intel-list"></div></article>
+            <article class="surface"><span class="eyebrow">Data contract</span><h3>Lock in expectations</h3><p class="muted">Capture the current schema, required fields, and unique identifiers; then validate future versions.</p><div class="stack contract-actions"><button id="generate-contract-btn" class="button primary">Generate contract</button><button id="validate-contract-btn" class="button ghost">Validate dataset</button><button id="download-contract-btn" class="button ghost">Download JSON</button></div><div id="contract-result" class="intel-result empty">No contract yet.</div></article>
+          </div>
+        </div>
+
+        <div id="intel-ask" class="intel-panel">
+          <div class="intel-grid two">
+            <article class="surface ask-card"><span class="eyebrow">Ask your data</span><h3>Get an answer with receipts</h3><form id="data-question-form" class="question-form"><input id="data-question" placeholder="What is the average revenue? Which region has the highest sales?"><button class="button primary">Answer</button></form><div id="data-answer" class="intel-result empty">Answers include the calculation, source, and row count.</div></article>
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Anomaly inbox</span><h3>What needs attention?</h3></div><button id="scan-anomalies-btn" class="button ghost">Scan now</button></div><div id="anomaly-list" class="intel-list"></div></article>
+          </div>
+          <article class="surface dashboard-question"><span class="eyebrow">Dashboard question mode</span><h3>Describe the decision—not the chart</h3><form id="dashboard-question-form" class="question-form"><input id="dashboard-question" placeholder="Help leadership understand monthly enrollment and which programs are falling behind"><button class="button primary">Design dashboard</button></form><div id="dashboard-plan" class="dashboard-plan"></div></article>
+        </div>
+
+        <div id="intel-privacy" class="intel-panel">
+          <div class="intel-grid two">
+            <article class="surface"><div class="surface-head"><div><span class="eyebrow">Sensitive data scanner</span><h3>Find privacy risk</h3></div><button id="scan-privacy-btn" class="button primary">Scan dataset</button></div><p class="muted">Checks names and sample values for identifiers, contact details, financial, health, and demographic fields.</p><div id="privacy-findings" class="intel-list"></div></article>
+            <article class="surface"><span class="eyebrow">Automatic redaction</span><h3>Create a safe working copy</h3><p class="muted">Mask direct identifiers while preserving consistent pseudonyms for joins and repeat analysis.</p><div class="redaction-options"><label><input type="checkbox" value="email" checked> Emails</label><label><input type="checkbox" value="phone" checked> Phones</label><label><input type="checkbox" value="name" checked> Names</label><label><input type="checkbox" value="identifier" checked> IDs &amp; accounts</label><label><input type="checkbox" value="address" checked> Addresses</label><label><input type="checkbox" value="sensitive" checked> Health &amp; demographics</label></div><button id="redact-dataset-btn" class="button primary">Create redacted copy</button><div id="redaction-result" class="intel-result empty">The original dataset is never changed.</div></article>
+          </div>
+        </div>
+
+        <div id="intel-governance" class="intel-panel">
+          <div class="intel-grid two">
+            <article class="surface"><span class="eyebrow">Approval workflow</span><h3>Draft → Reviewed → Approved → Published</h3><div id="approval-track" class="approval-track"></div><div class="form-grid"><input id="approval-reviewer" placeholder="Reviewer name"><textarea id="approval-comment" rows="2" placeholder="Review note or decision"></textarea><button id="advance-approval-btn" class="button primary">Advance status</button></div><div id="approval-log" class="intel-list"></div></article>
+            <article class="surface"><span class="eyebrow">Change impact</span><h3>See what a change could affect</h3><select id="impact-target" class="wide-select"></select><div id="impact-result" class="intel-result empty">Choose a field, metric, or term to trace its downstream use.</div></article>
+          </div>
+          <article class="surface template-market"><div class="surface-head"><div><span class="eyebrow">Template marketplace</span><h3>Start with a proven operating model</h3></div></div><div id="template-grid" class="template-grid"></div></article>
+        </div>
+
+        <div id="intel-deploy" class="intel-panel">
+          <div class="intel-grid two">
+            <article class="surface"><span class="eyebrow">Connector setup generator</span><h3>Build a secure database gateway starter</h3><div class="form-grid"><select id="gateway-database"><option>PostgreSQL</option><option>SQL Server</option><option>MySQL</option><option>Snowflake</option></select><select id="gateway-language"><option value="node">Node.js + Express</option><option value="python">Python + FastAPI</option></select><input id="gateway-table" placeholder="Approved view or table name"><button id="generate-gateway-btn" class="button primary">Download starter kit</button></div><p class="fine-print">Generated kits use read-only credentials from environment variables. No secrets are placed in this website.</p></article>
+            <article class="surface"><span class="eyebrow">Organization readiness</span><h3>Is this ready to scale?</h3><div id="readiness-questions" class="readiness-questions"></div><button id="score-readiness-btn" class="button primary">Score readiness</button><div id="readiness-result" class="intel-result empty">Rate six foundations to get a score and next-step roadmap.</div></article>
+          </div>
+        </div>
+      </section>
+
       <section id="view-report" class="studio-view">
         <div class="view-heading"><div><span class="eyebrow">Executive output</span><h2>Report Studio</h2><p>Turn the current project into a concise narrative with evidence and recommendations.</p></div><div class="action-row"><button id="generate-report-btn" class="button primary">Generate report</button><button id="present-report-btn" class="button ghost">Present</button><button id="download-pptx-btn" class="button ghost">PowerPoint</button><button id="download-report-btn" class="button ghost">HTML</button></div></div>
         <article id="report-canvas" class="report-canvas"></article>
@@ -157,6 +216,7 @@
 
   <script src="../shared/parse.js"></script>
   <script src="studio.js"></script>
+  <script src="intelligence.js"></script>
   <script src="../shared/platform.js"></script>
 </body>
 </html>

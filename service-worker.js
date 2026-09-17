@@ -1,4 +1,4 @@
-const CACHE = "datahub-platform-v5";
+const CACHE = "datahub-platform-v6";
 const CORE = [
   "./",
   "./index.html",
@@ -10,7 +10,9 @@ const CORE = [
   "./tools/studio/index.html",
   "./tools/studio/studio.css",
   "./tools/studio/source-guide.css",
-  "./tools/studio/studio.js"
+  "./tools/studio/studio.js",
+  "./tools/studio/intelligence.css",
+  "./tools/studio/intelligence.js"
 ];
 
 self.addEventListener("install", event => {

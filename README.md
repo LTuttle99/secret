@@ -9,7 +9,7 @@ and a card on the landing page, and it's a new tool.
 
 | Tool | Folder | What it does |
 |---|---|---|
-| DataHub Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, transformations, quality monitoring, executive reports, PowerPoint/HTML export, custom tools, connections, collaboration bundles, and schedules |
+| DataHub Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, data intelligence, privacy controls, governance, reports, custom tools, connections, collaboration bundles, and schedules |
 | Data Analyzer | `tools/data-analyzer/` | KPIs, forecasting, goal pacing, anomaly detection, AI insights on CSV, TSV, delimited text, JSON and Excel data |
 | File Diff | `tools/file-diff/` | Compares two files by a key column — added / removed / changed rows |
 | Pivot & Chart Explorer | `tools/pivot-explorer/` | Ad-hoc pivot table + chart on any file, no fixed schema |
@@ -134,6 +134,11 @@ library's output through `tools/shared/sanitize.js` before rendering.
   export, custom tools, public HTTP/Google Sheets connections, portable team
   bundles, and calendar schedules. Browser AI is used only when a compatible
   local model is exposed; the deterministic private planner remains available.
+- **Data intelligence workspace** — guided column roles and joins, a business
+  glossary, reusable metric formulas with calculation lineage, data contracts,
+  anomaly monitoring, question-based analysis, dashboard planning, sensitive
+  data scanning and redaction, review approvals, impact previews, project
+  templates, database-gateway starter kits, and an organization readiness score.
 - **Guided data-source setup** — Vanessa asks where the data lives and gives a
   step-by-step preparation, permission, privacy, and connection walkthrough for
   local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,
