@@ -18,6 +18,8 @@
         }
     </style>
     <script src="tools/shared/theme.js"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="tools/shared/platform.css">
 </head>
 
 <body class="bg-slate-100 text-slate-900 min-h-screen font-sans">
@@ -114,25 +116,25 @@
             <p class="text-slate-700 leading-relaxed mb-3">
                 Nowhere. Every tool runs inside your own browser tab. There is no server behind this
                 hub to send anything to, so files you pick are read on your own machine and never
-                uploaded. Closing the tab clears whatever you were working on, the same way closing
-                a document without saving would.
+                uploaded. Individual tool sessions normally clear when the tab closes; files and
+                projects you deliberately place in the shared workspace or DataHub Studio remain
+                in this browser so you can continue later.
             </p>
             <p class="text-slate-700 leading-relaxed">
-                Two small exceptions worth knowing. The hub remembers which tools you opened most
-                recently so it can offer shortcuts, and the Data Analyzer can save your filter
-                setups as named views. Both are kept only in your own browser on your own device,
-                and neither one stores any of your data. Your access code is never saved anywhere.
+                The hub also remembers favorites, recent tools, display preferences, the shared
+                workspace file, and saved Studio projects. Those records stay only in browser
+                storage on this device unless you explicitly export a project bundle.
             </p>
         </section>
 
         <section class="mb-8">
             <h3 class="text-sm font-semibold uppercase tracking-wider text-slate-500 mb-3">A Few Things to Know</h3>
             <ul class="space-y-2 text-slate-700">
-                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>You'll need to re-enter your code each time you open the hub. It isn't remembered between visits, by design.</span></li>
+                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>No code or account is required during development. Tools open immediately.</span></li>
                 <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>Works on your phone or tablet, though the tools that show wide tables are easier to read on a laptop.</span></li>
-                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>Nothing to install and nothing to update. You're always using the latest version.</span></li>
+                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>You can use it in the browser or install DataHub as an app from a supported browser.</span></li>
                 <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>Very large files (hundreds of thousands of rows) will feel slow, because all the work happens on your own machine rather than on a server.</span></li>
-                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>When a tool reads an Excel workbook, it uses the first sheet.</span></li>
+                <li class="flex gap-2"><span class="text-[#0062F1] font-bold">&bull;</span><span>When an Excel workbook contains multiple sheets, DataHub asks which sheet to use or lets you combine them.</span></li>
             </ul>
         </section>
 
@@ -147,5 +149,6 @@
 
     </main>
 
+    <script src="tools/shared/platform.js"></script>
 </body>
 </html>

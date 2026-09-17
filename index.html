@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300133C'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%230062F1' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2307050B'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%23FF2BD6' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
     <style>
         .font-serif-brand { font-family: 'Lora', ui-serif, Georgia, serif; }
         html { scroll-behavior: smooth; }
@@ -127,6 +127,9 @@
         }
     </style>
     <script src="tools/shared/theme.js"></script>
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="stylesheet" href="tools/shared/platform.css">
+    <link rel="stylesheet" href="hub-neon.css">
 </head>
 
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
@@ -164,12 +167,12 @@
             <a href="dashboards.html" class="text-xs font-semibold text-white bg-[#0062F1] hover:bg-[#00133C] px-3 py-1.5 rounded-full transition-colors">
                 Dashboards
             </a>
+            <a href="tools/studio/index.html" class="text-xs font-semibold text-white bg-[#00133C] hover:bg-[#0062F1] px-3 py-1.5 rounded-full transition-colors">
+                Studio
+            </a>
             <a href="getting-started.html" class="text-xs font-medium text-[#0062F1] hover:text-[#00133C] bg-blue-50 hover:bg-blue-100 px-3 py-1.5 rounded-full border border-blue-100 transition-colors">
                 Getting Started Guide
             </a>
-            <div class="text-xs font-medium text-[#00133C] bg-slate-100 px-3 py-1.5 rounded-full border border-slate-200">
-                Internal Tools
-            </div>
         </div>
     </header>
 
@@ -238,7 +241,7 @@
             <div id="recent-list" class="flex flex-wrap gap-2"></div>
         </section>
 
-        <section data-reveal class="sticky top-[73px] z-20 py-3 -mx-3 px-3 bg-slate-50/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-sm">
+        <section data-reveal class="hub-tool-controls sticky top-[73px] z-20 py-3 -mx-3 px-3 bg-slate-50/90 backdrop-blur-xl rounded-2xl border border-slate-200/60 shadow-sm">
             <div class="flex flex-col gap-3">
             <div class="flex flex-col sm:flex-row gap-3 sm:items-center sm:justify-between">
             <div class="relative max-w-xl flex-1">
@@ -267,6 +270,18 @@
             <h3 class="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Explore &amp; Analyze</h3>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+                <a href="tools/studio/index.html" data-tool="studio" class="tool-card group bg-[#00133C] border border-[#00133C] hover:border-[#0062F1] hover:shadow-xl rounded-xl p-6 shadow-md transition-all flex flex-col text-white">
+                    <div class="h-10 w-10 rounded-lg bg-[#0062F1] text-white flex items-center justify-center text-lg font-bold mb-4" aria-hidden="true">S</div>
+                    <h4 class="text-base font-semibold text-white mb-1.5">DataHub Studio</h4>
+                    <p class="text-sm text-slate-300 leading-relaxed flex-1">
+                        Work with Vanessa and your team from raw files to accountable action—analyze,
+                        collaborate, govern, assign, approve, and publish the result.
+                    </p>
+                    <span class="mt-4 text-xs font-semibold text-blue-300 group-hover:text-white inline-flex items-center gap-1">
+                        Open Studio <span aria-hidden="true">&rarr;</span>
+                    </span>
+                </a>
 
                 <a href="tools/data-analyzer/index.html" data-tool="data-analyzer" class="tool-card group bg-white border border-slate-200 hover:border-[#0062F1] hover:shadow-md rounded-xl p-6 shadow-sm transition-all flex flex-col">
                     <div class="h-10 w-10 rounded-lg bg-[#00133C] text-white flex items-center justify-center text-lg font-bold mb-4" aria-hidden="true">D</div>
@@ -580,7 +595,7 @@
                     </span>
                 </a>
 
-                <a href="tools/code-helper/index.html" data-tool="code-helper" class="tool-card group bg-white border border-slate-200 hover:border-[#0062F1] hover:shadow-md rounded-xl p-6 shadow-sm transition-all flex flex-col">
+                <a href="tools/code-helper/index.html" data-tool="code-helper" data-local="true" class="tool-card group bg-white border border-slate-200 hover:border-[#0062F1] hover:shadow-md rounded-xl p-6 shadow-sm transition-all flex flex-col">
                     <div class="h-10 w-10 rounded-lg bg-[#00133C] text-white flex items-center justify-center text-lg font-bold mb-4" aria-hidden="true">{ }</div>
                     <h4 class="text-base font-semibold text-[#00133C] mb-1.5">Code Helper</h4>
                     <p class="text-sm text-slate-600 leading-relaxed flex-1">
@@ -604,17 +619,6 @@
                     </span>
                 </a>
 
-            </div>
-        </section>
-
-        <section>
-            <div class="bg-slate-100/60 border border-dashed border-slate-300 rounded-xl p-6 max-w-md">
-                <div class="h-10 w-10 rounded-lg bg-slate-200 text-slate-500 flex items-center justify-center text-lg font-bold mb-4" aria-hidden="true">+</div>
-                <h4 class="text-base font-semibold text-slate-500 mb-1.5">More tools coming soon</h4>
-                <p class="text-sm text-slate-500 leading-relaxed">
-                    This hub is built to grow — add a new folder under <code class="text-slate-600">tools/</code>
-                    and a card here to bring another tool online.
-                </p>
             </div>
         </section>
 
@@ -680,7 +684,7 @@
         }
 
         function decorateCatalog() {
-            const labels = { 'data-analyzer': 'Popular', 'instant-dashboard': 'Popular', 'dashboard-builder': 'Updated', 'stat-tests': 'New' };
+            const labels = { 'studio': 'New', 'data-analyzer': 'Popular', 'instant-dashboard': 'Popular', 'dashboard-builder': 'Updated', 'stat-tests': 'New' };
             const favorites = new Set(readFavorites());
 
             categorySections.forEach((section, index) => {
@@ -804,7 +808,8 @@
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 6000);
             try {
-                const resp = await fetch(url, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+                let resp = await fetch(url, { method: 'HEAD', cache: 'no-store', signal: controller.signal });
+                if (!resp.ok && !controller.signal.aborted) resp = await fetch(url, { method: 'GET', cache: 'no-store', signal: controller.signal });
                 clearTimeout(timeout);
                 const online = resp.ok;
                 setCardStatus(card, online);
@@ -910,6 +915,7 @@
         });
 
         const finderAliases = {
+            'studio': ['project', 'workflow', 'automation', 'repeatable', 'quality monitoring', 'executive report', 'all in one'],
             'data-analyzer': ['forecast', 'kpi', 'insight', 'anomaly', 'analyze data', 'performance', 'trend'],
             'instant-dashboard': ['automatic dashboard', 'quick dashboard', 'visualize file', 'show my data'],
             'dashboard-builder': ['custom dashboard', 'build dashboard', 'share dashboard', 'layout'],
@@ -948,17 +954,38 @@
             }).sort((a, b) => b.score - a.score)[0];
         }
 
+        function findWorkflow(query) {
+            const q = query.toLowerCase();
+            if (/monthly|report|recurring/.test(q)) return ['data-cleaner', 'data-analyzer', 'dashboard-builder'];
+            if (/quality|messy|duplicate|clean/.test(q)) return ['column-stats', 'data-cleaner', 'fuzzy-dupes'];
+            if (/survey|responses|questionnaire/.test(q)) return ['text-analyzer', 'stat-tests', 'chart-builder'];
+            if (/compare|changed|difference/.test(q)) return ['file-diff', 'data-analyzer'];
+            if (/merge|combine|join|lookup/.test(q)) return ['data-cleaner', 'lookup-merge', 'column-stats'];
+            if (/dashboard|visual|present|report/.test(q)) return ['data-cleaner', 'instant-dashboard', 'dashboard-builder'];
+            if (/forecast|trend|predict|anomaly/.test(q)) return ['data-cleaner', 'data-analyzer', 'chart-builder'];
+            return [];
+        }
+
         document.getElementById('tool-finder-form').addEventListener('submit', (event) => {
             event.preventDefault();
+            const form = event.currentTarget;
             const input = document.getElementById('tool-finder-input');
             const result = document.getElementById('finder-result');
             const query = input.value.trim();
             if (!query) { input.focus(); return; }
             const match = findBestTool(query);
             const card = match.card;
+            const workflow = findWorkflow(query).map(cardFor).filter(Boolean);
             result.classList.remove('hidden');
-            result.innerHTML = `<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa recommends</p><p class="mt-1 text-lg font-semibold">${toolTitle(card)}</p><p class="mt-1 text-sm text-slate-300">${match.score > 0 ? 'This is the closest match for what you described.' : 'I’m not completely sure, but this is the best place to start.'}</p></div><a href="${card.getAttribute('href')}" data-finder-tool="${card.dataset.tool}" class="shrink-0 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#00133C] hover:bg-blue-50">Take me there →</a></div>`;
-            result.querySelector('[data-finder-tool]').addEventListener('click', () => recordRecent(card.dataset.tool));
+            if (workflow.length > 1) {
+                result.innerHTML = `<div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa’s recommended workflow</p><div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-stretch">${workflow.map((step, index) => `<a href="${step.getAttribute('href')}" data-finder-tool="${step.dataset.tool}" class="group flex flex-1 items-center gap-3 rounded-xl border border-white/10 bg-white/10 p-3 hover:bg-white/15"><span class="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white text-xs font-bold text-[#00133C]">${index + 1}</span><span><strong class="block text-sm">${toolTitle(step)}</strong><span class="text-xs text-slate-300">${index === 0 ? 'Start here' : 'Then continue'}</span></span></a>`).join('<span class="hidden self-center text-blue-200 sm:block">→</span>')}</div></div>`;
+            } else if (match.score < 4) {
+                result.innerHTML = `<div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">One quick question</p><p class="mt-1 text-base font-semibold">What kind of result do you want?</p><div class="mt-3 flex flex-wrap gap-2"><button data-followup="compare two versions of my file" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Find changes</button><button data-followup="clean and fix problems in my data" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Clean it</button><button data-followup="analyze trends and create insights" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Analyze it</button><button data-followup="build a dashboard to share" class="rounded-full border border-white/15 bg-white/10 px-3 py-2 text-xs font-semibold hover:bg-white/20">Build a dashboard</button></div></div>`;
+                result.querySelectorAll('[data-followup]').forEach(button => button.addEventListener('click', () => { input.value = `${query} — ${button.dataset.followup}`; form.requestSubmit(); }));
+            } else {
+                result.innerHTML = `<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-wider text-blue-200">Vanessa recommends</p><p class="mt-1 text-lg font-semibold">${toolTitle(card)}</p><p class="mt-1 text-sm text-slate-300">This is the closest match for what you described.</p></div><a href="${card.getAttribute('href')}" data-finder-tool="${card.dataset.tool}" class="shrink-0 rounded-xl bg-white px-4 py-2.5 text-center text-sm font-semibold text-[#00133C] hover:bg-blue-50">Take me there →</a></div>`;
+            }
+            result.querySelectorAll('[data-finder-tool]').forEach(link => link.addEventListener('click', () => recordRecent(link.dataset.finderTool)));
         });
 
         document.querySelectorAll('.view-button').forEach((button) => button.addEventListener('click', () => {
@@ -1048,14 +1075,6 @@
             if (e.target === paletteOverlay) closePalette();
         });
 
-        document.addEventListener('keydown', (e) => {
-            if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-                e.preventDefault();
-                if (paletteOverlay.classList.contains('hidden')) openPalette();
-                else closePalette();
-            }
-        });
-
         decorateCatalog();
         buildCategoryFilters();
         initStatusBadges();
@@ -1102,5 +1121,6 @@
     <script src="tools/shared/vanessa-knowledge.js"></script>
     <script src="tools/shared/vanessa.js"></script>
 
+    <script src="tools/shared/platform.js"></script>
 </body>
 </html>

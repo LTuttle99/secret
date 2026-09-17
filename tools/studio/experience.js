@@ -4,7 +4,7 @@
   if(!studio) return;
   const $=s=>document.querySelector(s), $$=s=>Array.from(document.querySelectorAll(s));
   const modeRank={guided:0,standard:1,expert:2};
-  const viewLabels={overview:"Overview",data:"Data catalog",workflow:"Workflow",dictionary:"Dictionary",quality:"Data quality",intelligence:"Intelligence",analyst:"Analyst Lab",operations:"Operations",report:"Report Studio",automate:"Automation",builder:"Tool Builder"};
+  const viewLabels={overview:"Overview",data:"Data catalog",workflow:"Workflow",dictionary:"Dictionary",quality:"Data quality",intelligence:"Intelligence",analyst:"Analyst Lab",dashboard:"Dashboard Studio",operations:"Operations",report:"Report Studio",automate:"Automation",builder:"Tool Builder"};
   let selected=0, filtered=[], saveTimer=null, gPending=false;
 
   function setMode(mode,announce=true){

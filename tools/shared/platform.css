@@ -177,3 +177,19 @@ body > main > :where(div, section)[class*="bg-white"][class*="border"] {
 @media (prefers-reduced-motion: reduce) {
   .dh-drop-zone, .dh-toast { animation: none; transition: none; }
 }
+
+/* Shared neon shell */
+[data-theme="dark"] body{background-image:radial-gradient(circle at 90% 0,rgba(255,43,214,.11),transparent 30rem),radial-gradient(circle at 8% 48%,rgba(155,92,255,.07),transparent 34rem)!important}
+[data-theme="dark"] body:before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,.014) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.014) 1px,transparent 1px);background-size:52px 52px}
+[data-theme="dark"] body>header{border-color:rgba(255,255,255,.08)!important;background:rgba(8,6,12,.88)!important;box-shadow:0 10px 40px rgba(0,0,0,.26)}
+[data-theme="dark"] body>main>:where(div,section)[class*="bg-white"][class*="border"]{box-shadow:0 16px 45px rgba(0,0,0,.2),0 0 28px rgba(255,43,214,.025)}
+[data-theme="dark"] body>main :where(button,a,input,select,textarea):focus-visible{outline-color:rgba(255,43,214,.34)}
+[data-theme="dark"] .dh-platform-bar{border-color:rgba(255,255,255,.11);background:rgba(10,7,14,.9);box-shadow:0 18px 50px rgba(0,0,0,.4),0 0 30px rgba(255,43,214,.08)}
+[data-theme="dark"] .dh-platform-button:hover{color:#ff66df;background:rgba(255,43,214,.1)}
+[data-theme="dark"] .dh-modal,[data-theme="dark"] .dh-modal-head{border-color:rgba(255,255,255,.1);background:#120d1a}
+[data-theme="dark"] .dh-command-item:hover,[data-theme="dark"] .dh-command-item[aria-selected="true"]{background:rgba(255,43,214,.11)}
+[data-theme="dark"] .dh-command-icon{background:linear-gradient(145deg,#ff2bd6,#8d42ff);box-shadow:0 0 18px rgba(255,43,214,.2)}
+[data-theme="dark"] .dh-workspace-banner,[data-theme="dark"] .dh-drop-zone{border-color:rgba(255,43,214,.22);background:rgba(255,43,214,.055)}
+[data-theme="dark"] .dh-small-button,[data-theme="dark"] .dh-bundle,[data-theme="dark"] .dh-advanced-toggle{border-color:rgba(255,255,255,.1);background:#15101f;color:#b4a5c0}
+[data-theme="dark"] .dh-small-button:hover,[data-theme="dark"] .dh-bundle:hover,[data-theme="dark"] .dh-advanced-toggle:hover{border-color:#ff2bd6;color:#ff69df;background:rgba(255,43,214,.08)}
+[data-theme="dark"] .dh-toast{background:linear-gradient(120deg,#ff2bd6,#8d42ff);box-shadow:0 12px 36px rgba(255,43,214,.25)}

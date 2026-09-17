@@ -9,6 +9,7 @@ and a card on the landing page, and it's a new tool.
 
 | Tool | Folder | What it does |
 |---|---|---|
+| DataHub Studio | `tools/studio/` | Local-first projects, multi-file catalogs, workflow recipes, data intelligence, privacy controls, governance, reports, custom tools, connections, collaboration bundles, and schedules |
 | Data Analyzer | `tools/data-analyzer/` | KPIs, forecasting, goal pacing, anomaly detection, AI insights on CSV, TSV, delimited text, JSON and Excel data |
 | File Diff | `tools/file-diff/` | Compares two files by a key column — added / removed / changed rows |
 | Pivot & Chart Explorer | `tools/pivot-explorer/` | Ad-hoc pivot table + chart on any file, no fixed schema |
@@ -113,15 +114,63 @@ library's output through `tools/shared/sanitize.js` before rendering.
 
 ## Hub features
 
+- **Vanessa tool finder and workflows** — describe an outcome in plain English
+  and Vanessa either recommends one tool, asks a focused follow-up question, or
+  lays out a multi-tool sequence.
+- **Shared workspace** — a file dropped on the hub is stored in IndexedDB and can
+  be loaded into file-based tools without selecting it again. It never leaves
+  the browser. Every tool also has a safe sample-data shortcut.
+- **Task bundles** — common jobs such as monthly reporting, data quality, survey
+  analysis, and dashboard creation open as guided multi-tool workflows.
+- **Platform controls** — the floating control bar provides the command center,
+  workspace status, a unified export center, and theme control on every page.
+- **Installable app** — `manifest.webmanifest` and `service-worker.js` allow the
+  hub to be installed and cache visited pages for more resilient repeat use.
+- **Progressive controls** — sections explicitly labeled as advanced, options,
+  settings, or configuration begin collapsed and can be revealed when needed.
+- **DataHub Studio** — named projects persist in IndexedDB and bring together
+  multiple datasets, inferred relationships, reusable workflow steps, lineage,
+  dictionaries, quality rules, reports, presentation mode, PowerPoint/HTML
+  export, custom tools, public HTTP/Google Sheets connections, portable team
+  bundles, and calendar schedules. Browser AI is used only when a compatible
+  local model is exposed; the deterministic private planner remains available.
+- **Data intelligence workspace** — guided column roles and joins, a business
+  glossary, reusable metric formulas with calculation lineage, data contracts,
+  anomaly monitoring, question-based analysis, dashboard planning, sensitive
+  data scanning and redaction, review approvals, impact previews, project
+  templates, database-gateway starter kits, and an organization readiness score.
+- **Vanessa Analyst Lab** — goal-driven analysis plans, one-click industry
+  packages, reversible cleaning suggestions, dataset-version comparison,
+  drag-and-drop exploration, geographic and text analysis, forecasting and
+  scenarios, statistical guidance, executive stories, report design,
+  presentation coaching, a safe SQL subset, Python/R/SQL exports, synthetic
+  data, final quality gates, guided learning, completion scoring, and portal
+  branding. Analyst Lab changes retain local undo snapshots for review.
+- **Project chat** — a responsive team drawer provides General, Analysis, Data
+  Quality, and Decisions channels; replies, mentions, pinned decisions, search,
+  dataset/metric/definition/story references, unread counts, typing indicators,
+  and active-user presence. Local chat persists in each Studio project and
+  syncs across same-origin tabs. Teams can optionally enter a Supabase project
+  URL, publishable key, and shared room name for live cross-device Realtime
+  Broadcast; the key stays in that browser and is excluded from project bundles.
+- **Analytics Operations Hub** — chat messages become assignments, data issues,
+  and governed decisions; teams can annotate evidence, arrange a live shared
+  canvas, monitor thresholds, collect analysis requests and form responses,
+  prepare scheduled exports, assign project roles, create encrypted read-only
+  shares, branch analyses, inspect the audit trail and lineage graph, certify
+  metric ownership, maintain an organization knowledge base, review portfolio
+  health, run five specialist review agents, capture meeting minutes, dictate
+  work by voice, publish an internal analytics portal, and install guided
+  connector packs. External email and messaging-platform notifications are not
+  included; alerts remain in DataHub or the optional Live Room.
+- **Guided data-source setup** — Vanessa asks where the data lives and gives a
+  step-by-step preparation, permission, privacy, and connection walkthrough for
+  local files, folders and ZIPs, Google Sheets, public URLs, databases, Airtable,
+  SharePoint/OneDrive, SQLite, and Access.
 - **Search** — the search box on the landing page filters cards by name and
   description as you type; empty categories hide themselves automatically.
-- **Command palette** — Ctrl+K (Cmd+K on Mac) opens a jump-to-tool box with
-  arrow-key navigation. It only ever lists tools the current access code
-  unlocks.
-- **Recently used** — the last five tools opened appear as chips at the top of
-  the hub, stored in `localStorage` under `hub_recent_tools` and filtered to
-  the current code's tools. This is the one thing the hub remembers between
-  visits; the access code itself is still never stored.
+- **Command center** — Ctrl+K (Cmd+K on Mac) searches every tool and runs global actions such as sample data, theme changes, and PDF export.
+- **Recently used and continue** — recent tools, favorites, and the preferred card/compact layout are remembered locally in the browser.
 - **Categories** — tools are grouped into four sections by what you are trying
   to do: "Explore & Analyze", "Clean & Combine", "Generate & Encode", and
   "Text & Dev Utilities". Sections with no visible tools hide themselves.
@@ -140,39 +189,6 @@ library's output through `tools/shared/sanitize.js` before rendering.
   None of them carry your data.) Update the headline/blurb
   and `href` directly in the root `index.html` whenever you want to change
   what it points to.
-- **Access code gate** — every visit (and every refresh) opens on a
-  full-screen black keypad ("Enter Access Code") that covers the whole hub;
-  nothing behind it is reachable until a valid numeric code is entered.
-  Wrong codes shake and clear; there's no "skip" or "show all" control.
-  Each code unlocks only the tools assigned to it — the `VIEW_CODES` object
-  in the `<script>` at the bottom of the root `index.html` maps each code to
-  a label and a list of `data-tool` ids (visible as a `data-tool="..."`
-  attribute on every card in the HTML). Current codes:
-
-  | Code | View | Tools |
-  |---|---|---|
-  | `1159` | Data Analyst | all tools |
-  | `7284` | Leadership | Data Analyzer, Instant Dashboard, Dashboard Builder, Pivot & Chart Explorer, Chart Builder, Statistical Tests |
-  | `5931` | Marketing | QR Generator, Color Tools, Markdown Previewer, Text Analyzer, Chart Builder, Instant Dashboard, Dashboard Builder |
-  | `4067` | IT / Dev | JSON Formatter, Regex Tester, Base64/URL Encoder, Timestamp Converter, Text Diff, File Diff, SQL Workbench, Code Helper, JWT Decoder, Test Data Generator, Instant Dashboard, Dashboard Builder |
-  | `8412` | HR / Operations | Data Cleaner, Format Converter, Column Statistics, Timestamp Converter, Lookup & Merge, Fuzzy Duplicate Finder, Instant Dashboard, Dashboard Builder, Statistical Tests |
-  | `2650` | Finance | Data Analyzer, Column Statistics, Pivot & Chart Explorer, File Diff, SQL Workbench, Lookup & Merge, Chart Builder, Instant Dashboard, Dashboard Builder, Statistical Tests |
-
-  Dashboard Builder is on every code on the assumption that anyone might want to
-  request a dashboard. Trim it out of any view where that is not true.
-
-  A code is not remembered anywhere (no `localStorage`, no URL param), so it
-  has to be re-entered on every fresh load by design, and there's no way to
-  switch views without refreshing and re-entering a (possibly different)
-  code.
-
-  **This is a convenience filter, not access control.** It only covers the
-  landing page — anyone who knows or guesses a tool's direct URL (e.g.
-  `tools/data-analyzer/index.html`) can open it directly, bypassing the
-  gate entirely, since there's no backend to actually check credentials
-  against. Real per-person restriction would need a server with
-  authentication, which is a different architecture than this static site.
-
 ## Statistical Tests (`tools/stat-tests/`)
 
 Six tests over a loaded file, each reporting the statistic, its degrees of freedom, a p
@@ -1184,23 +1200,18 @@ avoids that entirely.)
 
 ## Publishing
 
-The hub is hosted on **Azure Static Web Apps**, deployed from the GitHub repo
-by the workflow in `.github/workflows/`. Edit the files, commit, and push:
-the Action rebuilds and redeploys on every push to `main`. There is no build
-step, no server to restart, and nothing to redeploy manually.
+The hub is hosted with **GitHub Pages** from the GitHub repository. Edit the
+files, commit, and push to the configured Pages branch. There is no build step
+or application server to restart.
 
 The site is static end to end, so a deploy is just a file copy. If a change
 looks right at `http://localhost:8020` via `./serve.sh`, it will look the same
 once deployed.
 
-Two things to know if a backend is ever added (the Dashboard Builder data feed
-is the likely first case):
-
-- Static Web Apps includes managed Azure Functions on the free tier, but the
-  workflow ships with `api_location: ""`. It has to point at an `api` folder
-  before any function will deploy.
-- Static Web Apps does not include a database. Persisting anything means
-  adding a separate resource such as Table Storage or Cosmos DB.
+GitHub Pages cannot run backend code. True accounts, server-side schedules,
+private database connections, and live multi-user collaboration would require
+a separate HTTPS API and database. Studio therefore keeps projects locally,
+uses public HTTP data sources, and exports portable bundles and calendar events.
 
 ## Renaming the hub
 

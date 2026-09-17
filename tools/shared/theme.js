@@ -14,15 +14,14 @@ function themeStored() {
 
 function themeRemember(theme) {
   try {
-    if (theme === "dark") localStorage.setItem(THEME_KEY, "dark");
-    else localStorage.removeItem(THEME_KEY);
+    localStorage.setItem(THEME_KEY, theme === "light" ? "light" : "dark");
   } catch (e) {
     return;
   }
 }
 
 function themePreferred() {
-  return themeStored() || "light";
+  return themeStored() || "dark";
 }
 
 function themeRule(cls, decl) {
@@ -68,21 +67,21 @@ function themeTintRules(name, bg, border, ink, inkStrong) {
 }
 
 function themeCss() {
-  const surface = "#121b2f";
-  const sunken = "#0a1020";
-  const raised = "#1a2540";
-  const border = "#26334f";
-  const borderStrong = "#35435f";
-  const text = "#e6ecf7";
-  const text800 = "#dae2f1";
-  const text700 = "#c6d2e6";
-  const text600 = "#a9b7ce";
-  const text500 = "#90a0ba";
-  const text400 = "#7b8aa4";
-  const text300 = "#5c6a83";
-  const heading = "#e8eefc";
-  const link = "#5b9bff";
-  const warn = "#f0a95c";
+  const surface = "#15101f";
+  const sunken = "#09070e";
+  const raised = "#1d1427";
+  const border = "#352640";
+  const borderStrong = "#50345e";
+  const text = "#f5effa";
+  const text800 = "#eee5f4";
+  const text700 = "#d4c8dd";
+  const text600 = "#b0a1bc";
+  const text500 = "#91829d";
+  const text400 = "#76687f";
+  const text300 = "#594d62";
+  const heading = "#ffffff";
+  const link = "#ff5ddd";
+  const warn = "#ff956d";
 
   const parts = [];
 
@@ -98,15 +97,15 @@ function themeCss() {
     + `--hub-text-dim:${text400};`
     + `--hub-text-soft:${text700};`
     + `--hub-brand:${link};`
-    + `--hub-brand-soft:#17294a;`
-    + `--hub-brand-edge:#24416f;`
+    + `--hub-brand-soft:#351538;`
+    + `--hub-brand-edge:#6b2d69;`
     + `--hub-bubble:${raised};`
     + `--hub-on-brand:#ffffff;`
-    + `--hub-header-bg:#0d1830;`
+    + `--hub-header-bg:#0d0913;`
     + `--hub-danger:#f87171;`
     + `--hub-warn:${warn};`
-    + `--hub-code-bg:#060b16;`
-    + `--hub-code-text:#dbe4f3;`
+    + `--hub-code-bg:#07050b;`
+    + `--hub-code-text:#f2e9f7;`
     + `}`);
 
   parts.push(`[data-theme="dark"] body,[data-theme="dark"] body[class]{background-color:${sunken};color:${text};}`);
@@ -249,12 +248,13 @@ function themeApply(theme) {
 
 function themeToggleLabel(button) {
   const dark = themeCurrent === "dark";
-  button.textContent = dark ? "Dark" : "Light";
+  button.textContent = "◐";
   button.setAttribute(
     "style",
     `border:1px solid var(--hub-border-strong, #cbd5e1);background:var(--hub-surface, #ffffff);color:var(--hub-text-muted, #475569);border-radius:9999px;padding:0.25rem 0.7rem;font-size:0.6875rem;font-weight:600;cursor:pointer;font-family:${THEME_FONT};white-space:nowrap;`
   );
   button.setAttribute("aria-pressed", dark ? "true" : "false");
+  button.setAttribute("aria-label", dark ? "Switch to light theme" : "Switch to dark theme");
   button.title = dark ? "Switch to the light theme" : "Switch to the dark theme";
 }
 

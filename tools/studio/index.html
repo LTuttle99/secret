@@ -23,6 +23,8 @@
   <link rel="stylesheet" href="experience.css">
   <link rel="stylesheet" href="neon.css">
   <link rel="stylesheet" href="evidence.css">
+  <link rel="stylesheet" href="pulse.css">
+  <link rel="stylesheet" href="command-center.css">
   <script src="../shared/theme.js"></script>
 </head>
 <body>
@@ -56,6 +58,7 @@
         <button data-view="quality" data-mode-min="standard" class="nav-item"><span>✓</span>Quality</button>
         <button data-view="intelligence" data-mode-min="standard" class="nav-item"><span>✦</span>Intelligence</button>
         <button data-view="analyst" data-mode-min="guided" class="nav-item"><span>V</span>Analyst Lab</button>
+        <button data-view="dashboard" data-mode-min="guided" class="nav-item"><span>▥</span>Dashboard</button>
         <button data-view="operations" data-mode-min="standard" class="nav-item"><span>◎</span>Operations</button>
         <button data-view="report" data-mode-min="guided" class="nav-item"><span>▤</span>Report</button>
         <button data-view="automate" data-mode-min="standard" class="nav-item"><span>↻</span>Automate</button>
@@ -77,6 +80,21 @@
         <div class="metric-grid" id="overview-metrics"></div>
 
         <article id="next-step-card" class="next-step-card" aria-live="polite"></article>
+
+        <section class="ask-data-layout">
+          <article class="surface ask-data-card">
+            <div class="ask-data-lockup"><span>V</span><div><span class="eyebrow">Ask your data</span><h3>Get an answer, then inspect the proof.</h3></div></div>
+            <form id="ask-data-form" class="ask-data-form"><input id="ask-data-input" autocomplete="off" placeholder="Try: total revenue by region"><button class="button primary">Analyze</button></form>
+            <div id="ask-data-suggestions" class="ask-data-suggestions"></div>
+            <div id="ask-data-result" class="ask-data-result empty">Add a dataset, then ask about totals, averages, categories, minimums, maximums, or top groups.</div>
+          </article>
+          <article class="surface project-pulse-card">
+            <div class="surface-head"><div><span class="eyebrow">Live project pulse</span><h3>What needs attention?</h3></div><button id="refresh-pulse-btn" class="icon-button">Refresh</button></div>
+            <div id="project-pulse" class="project-pulse"></div>
+          </article>
+        </section>
+
+        <article id="pinned-insights-panel" class="surface pinned-insights-panel" hidden><div class="surface-head"><div><span class="eyebrow">Decision board</span><h3>Pinned answers</h3></div><span id="pinned-insights-count" class="badge"></span></div><div id="pinned-insights" class="pinned-insights"></div></article>
 
         <div class="overview-grid">
           <article class="surface hero-surface">
@@ -202,6 +220,14 @@
         <div id="ops-extensions" class="ops-panel">
           <article class="surface"><span class="eyebrow">Connector marketplace</span><h3>Install guided integrations and analysis packs</h3><div class="market-filters"><button class="active" data-market-filter="all">All</button><button data-market-filter="data">Data</button><button data-market-filter="business">Business</button><button data-market-filter="research">Research</button></div><div id="connector-market" class="connector-market"></div></article>
         </div>
+      </section>
+
+      <section id="view-dashboard" class="studio-view">
+        <div class="view-heading"><div><span class="eyebrow">Interactive canvas</span><h2>Dashboard Studio</h2><p>Build a decision screen from the active dataset. Every widget responds to the same filter.</p></div><div class="action-row"><button id="executive-briefing-btn" class="button ghost">Executive briefing</button><button id="clear-dashboard-btn" class="button ghost">Clear</button></div></div>
+        <div class="dashboard-toolbar surface"><input id="widget-title" placeholder="Widget title"><select id="widget-type"><option value="kpi">KPI</option><option value="bar">Bar chart</option><option value="donut">Donut chart</option><option value="table">Data table</option></select><select id="widget-metric"></select><select id="widget-category"></select><button id="add-widget-btn" class="button primary">Add widget</button></div>
+        <div class="dashboard-filterbar"><span>Global filter</span><select id="dashboard-filter-column"></select><select id="dashboard-filter-value"></select><button id="clear-dashboard-filter" class="icon-button">Clear</button></div>
+        <div id="dashboard-canvas" class="dashboard-canvas"></div>
+        <article class="surface formula-builder"><div class="surface-head"><div><span class="eyebrow">Visual formula builder</span><h3>Create a calculated field</h3></div></div><div class="formula-row"><input id="formula-name" placeholder="profit"><input id="formula-expression" placeholder="[revenue] - [cost]"><button id="add-formula-btn" class="button primary">Calculate</button></div><div id="formula-columns" class="formula-columns"></div><p class="fine-print">Use field names in brackets with +, −, ×, ÷, and parentheses. The result is added to the active dataset.</p></article>
       </section>
 
       <section id="view-data" class="studio-view">
@@ -357,6 +383,8 @@
     <button class="mobile-nav-action" id="mobile-chat-btn"><span>◎</span>Chat</button>
     <button id="save-analysis-view-btn"><span>＋</span>Save view</button>
     <button id="open-saved-views-btn"><span>◫</span>Views <b id="saved-view-count">0</b></button>
+    <button id="focus-mode-btn"><span>◇</span>Focus</button>
+    <button id="history-btn"><span>↶</span>History</button>
     <button id="start-presentation-btn"><span>▶</span>Present</button>
   </nav>
 
@@ -399,6 +427,8 @@
   <script src="operations.js"></script>
   <script src="experience.js"></script>
   <script src="evidence.js"></script>
+  <script src="pulse.js"></script>
+  <script src="command-center.js"></script>
   <script src="../shared/platform.js"></script>
 </body>
 </html>

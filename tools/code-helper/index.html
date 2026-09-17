@@ -8,6 +8,9 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2300133C'/%3E%3Ctext x='16' y='23' font-family='Georgia,serif' font-size='19' fill='%230062F1' text-anchor='middle'%3EH%3C/text%3E%3C/svg%3E">
     <script src="../shared/theme.js"></script>
+    <link rel="manifest" href="../../manifest.webmanifest">
+    <link rel="stylesheet" href="../shared/platform.css">
+    <link rel="stylesheet" href="code-helper.css">
 </head>
 
 <body class="bg-slate-50 text-slate-900 min-h-screen font-sans">
@@ -71,7 +74,7 @@
                 <div class="bg-white border border-slate-200 rounded-xl p-4">
                     <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
                         <div id="language-tabs" class="flex flex-wrap gap-1"></div>
-                        <button onclick="copyCode()" class="text-xs text-[#0062F1] hover:text-[#00133C] font-medium">Copy Code</button>
+                        <div class="code-actions"><button onclick="downloadCode()" class="text-xs text-slate-500 hover:text-[#0062F1] font-medium">Download</button><button onclick="copyCode()" class="text-xs text-[#0062F1] hover:text-[#00133C] font-medium">Copy Code</button></div>
                     </div>
 
                     <h2 id="snippet-title" class="text-sm font-semibold text-[#00133C] mb-1"></h2>
@@ -305,6 +308,19 @@
             navigator.clipboard.writeText(text).then(() => showToast('Code copied to clipboard.'));
         }
 
+        function downloadCode() {
+            const text = document.getElementById('code-output').innerText;
+            if (!text) return;
+            const extensions = { python: 'py', r: 'R', sql: 'sql', javascript: 'js', java: 'java' };
+            const blob = new Blob([text], { type: 'text/plain' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${currentTask}.${extensions[currentLanguage] || 'txt'}`;
+            link.click();
+            setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+            showToast('Code file downloaded.');
+        }
+
         function populateColumnSelects() {
             const targets = [
                 ['col-category', 'category'],
@@ -426,5 +442,6 @@
         vanessaInit({ tool: 'code-helper' });
         definitionsInit({ tool: 'code-helper' });
     </script>
+    <script src="../shared/platform.js"></script>
 </body>
 </html>
